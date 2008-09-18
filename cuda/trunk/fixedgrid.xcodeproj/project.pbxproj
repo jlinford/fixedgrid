@@ -1,0 +1,208 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXFileReference section */
+		DE7C87AD0E40ECDC00E8E60A /* params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = params.h; sourceTree = "<group>"; };
+		DE7C87AE0E40ECDC00E8E60A /* precision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = precision.h; sourceTree = "<group>"; };
+		DE7C87AF0E40ECDC00E8E60A /* saprc99_Parameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = saprc99_Parameters.h; sourceTree = "<group>"; };
+		DE7C87B20E40ECDC00E8E60A /* fileio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fileio.c; sourceTree = "<group>"; };
+		DE7C87B30E40ECDC00E8E60A /* fileio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fileio.h; sourceTree = "<group>"; };
+		DE7C87B40E40ECDC00E8E60A /* fixedgrid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fixedgrid.c; sourceTree = "<group>"; };
+		DE7C87B50E40ECDC00E8E60A /* fixedgrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fixedgrid.h; sourceTree = "<group>"; };
+		DE7C87B60E40ECDC00E8E60A /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		DE7C87BA0E40ECDC00E8E60A /* saprc99_Function.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_Function.c; sourceTree = "<group>"; };
+		DE7C87BB0E40ECDC00E8E60A /* saprc99_Global.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = saprc99_Global.h; sourceTree = "<group>"; };
+		DE7C87BC0E40ECDC00E8E60A /* saprc99_Integrator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_Integrator.c; sourceTree = "<group>"; };
+		DE7C87BD0E40ECDC00E8E60A /* saprc99_Jacobian.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_Jacobian.c; sourceTree = "<group>"; };
+		DE7C87BE0E40ECDC00E8E60A /* saprc99_JacobianSP.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_JacobianSP.c; sourceTree = "<group>"; };
+		DE7C87BF0E40ECDC00E8E60A /* saprc99_LinearAlgebra.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_LinearAlgebra.c; sourceTree = "<group>"; };
+		DE7C87C00E40ECDC00E8E60A /* saprc99_Rates.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_Rates.c; sourceTree = "<group>"; };
+		DE7C87C10E40ECDC00E8E60A /* saprc99_Sparse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = saprc99_Sparse.h; sourceTree = "<group>"; };
+		DE7C87C20E40ECDC00E8E60A /* saprc99_Initialize.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_Initialize.c; sourceTree = "<group>"; };
+		DE7C87C50E40ECDC00E8E60A /* Makefile.defs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.mig; path = Makefile.defs; sourceTree = "<group>"; };
+		DE7C87C70E40EDA600E8E60A /* cuda_host.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cuda_host.h; sourceTree = "<group>"; };
+		DE7C87C80E40EDA600E8E60A /* cuda_host.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cuda_host.c; sourceTree = "<group>"; };
+		DE7C88460E40F6D700E8E60A /* discretize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = discretize.h; sourceTree = "<group>"; };
+		DE7C886D0E40F74100E8E60A /* discretize.cu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cuda; path = discretize.cu; sourceTree = "<group>"; };
+		DE7C88A80E40F89B00E8E60A /* saprc99_Monitor.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = saprc99_Monitor.c; sourceTree = "<group>"; };
+		DE7C88A90E40F89B00E8E60A /* saprc99_Monitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = saprc99_Monitor.h; sourceTree = "<group>"; };
+		DE7C88AA0E40F89B00E8E60A /* timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer.h; sourceTree = "<group>"; };
+		DE7C88AB0E40F89B00E8E60A /* timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timer.c; sourceTree = "<group>"; };
+		DE7C88AC0E40F8A700E8E60A /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		DED409C90E4349EE00888D86 /* transport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = transport.c; sourceTree = "<group>"; };
+		DED409CA0E4349EE00888D86 /* transport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = transport.h; sourceTree = "<group>"; };
+		DED40A270E434FFB00888D86 /* cuda_grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cuda_grid.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* fixedgrid */ = {
+			isa = PBXGroup;
+			children = (
+				DE7C87B60E40ECDC00E8E60A /* Makefile */,
+				DE7C87C50E40ECDC00E8E60A /* Makefile.defs */,
+				DE7C87AC0E40ECDC00E8E60A /* config */,
+				DE7C87B90E40ECDC00E8E60A /* saprc99 */,
+				DE7C87C80E40EDA600E8E60A /* cuda_host.c */,
+				DE7C87C70E40EDA600E8E60A /* cuda_host.h */,
+				DE7C88AC0E40F8A700E8E60A /* common.h */,
+				DE7C886D0E40F74100E8E60A /* discretize.cu */,
+				DE7C88460E40F6D700E8E60A /* discretize.h */,
+				DE7C87B20E40ECDC00E8E60A /* fileio.c */,
+				DE7C87B30E40ECDC00E8E60A /* fileio.h */,
+				DE7C87B40E40ECDC00E8E60A /* fixedgrid.c */,
+				DE7C87B50E40ECDC00E8E60A /* fixedgrid.h */,
+				DE7C87C20E40ECDC00E8E60A /* saprc99_Initialize.c */,
+				DE7C88A80E40F89B00E8E60A /* saprc99_Monitor.c */,
+				DE7C88A90E40F89B00E8E60A /* saprc99_Monitor.h */,
+				DE7C88AA0E40F89B00E8E60A /* timer.h */,
+				DE7C88AB0E40F89B00E8E60A /* timer.c */,
+				DED409CA0E4349EE00888D86 /* transport.h */,
+				DED409C90E4349EE00888D86 /* transport.c */,
+			);
+			name = fixedgrid;
+			sourceTree = "<group>";
+		};
+		DE7C87AC0E40ECDC00E8E60A /* config */ = {
+			isa = PBXGroup;
+			children = (
+				DE7C87AD0E40ECDC00E8E60A /* params.h */,
+				DE7C87AE0E40ECDC00E8E60A /* precision.h */,
+				DE7C87AF0E40ECDC00E8E60A /* saprc99_Parameters.h */,
+				DED40A270E434FFB00888D86 /* cuda_grid.h */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
+		DE7C87B90E40ECDC00E8E60A /* saprc99 */ = {
+			isa = PBXGroup;
+			children = (
+				DE7C87BA0E40ECDC00E8E60A /* saprc99_Function.c */,
+				DE7C87BB0E40ECDC00E8E60A /* saprc99_Global.h */,
+				DE7C87BC0E40ECDC00E8E60A /* saprc99_Integrator.c */,
+				DE7C87BD0E40ECDC00E8E60A /* saprc99_Jacobian.c */,
+				DE7C87BE0E40ECDC00E8E60A /* saprc99_JacobianSP.c */,
+				DE7C87BF0E40ECDC00E8E60A /* saprc99_LinearAlgebra.c */,
+				DE7C87C00E40ECDC00E8E60A /* saprc99_Rates.c */,
+				DE7C87C10E40ECDC00E8E60A /* saprc99_Sparse.h */,
+			);
+			path = saprc99;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		D28A88AD04BDD90700651E21 /* fixedgrid */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "fixedgrid" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/jlinford/workspace/fixedgrid_3d/cuda/trunk;
+			dependencies = (
+			);
+			name = fixedgrid;
+			passBuildSettingsInEnvironment = 1;
+			productName = fixedgrid;
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "fixedgrid" */;
+			compatibilityVersion = "Xcode 3.0";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* fixedgrid */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D28A88AD04BDD90700651E21 /* fixedgrid */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB919008733D9F0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUGGING_SYMBOLS = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = fixedgrid;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		1DEB919108733D9F0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = fixedgrid;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		1DEB919408733D9F0010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+			};
+			name = Debug;
+		};
+		1DEB919508733D9F0010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "fixedgrid" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB919008733D9F0010E9CD /* Debug */,
+				1DEB919108733D9F0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "fixedgrid" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB919408733D9F0010E9CD /* Debug */,
+				1DEB919508733D9F0010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

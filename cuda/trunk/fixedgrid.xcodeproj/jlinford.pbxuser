@@ -1,0 +1,275 @@
+// !$*UTF8*$!
+{
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeArchitecture = i386;
+		activeBuildConfigurationName = Release;
+		activeExecutable = DED4051F0E410AD700888D86 /* fixedgrid */;
+		activeTarget = D28A88AD04BDD90700651E21 /* fixedgrid */;
+		addToTargets = (
+		);
+		codeSenseManager = DE7C87A30E40ECC500E8E60A /* Code sense */;
+		executables = (
+			DED4051F0E410AD700888D86 /* fixedgrid */,
+		);
+		perUserDictionary = {
+			PBXPerProjectTemplateStateSaveDate = 239290815;
+			PBXWorkspaceStateSaveDate = 239290815;
+		};
+		perUserProjectItems = {
+			DED40A090E434EF200888D86 /* PBXBookmark */ = DED40A090E434EF200888D86 /* PBXBookmark */;
+			DED40A400E435BE200888D86 /* PBXBookmark */ = DED40A400E435BE200888D86 /* PBXBookmark */;
+			DED40A5F0E4363FE00888D86 /* PBXTextBookmark */ = DED40A5F0E4363FE00888D86 /* PBXTextBookmark */;
+			DED40A600E4363FE00888D86 /* PBXTextBookmark */ = DED40A600E4363FE00888D86 /* PBXTextBookmark */;
+		};
+		sourceControlManager = DE7C87A20E40ECC500E8E60A /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	D28A88AD04BDD90700651E21 /* fixedgrid */ = {
+		activeExec = 0;
+	};
+	DE7C87A20E40ECC500E8E60A /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	DE7C87A30E40ECC500E8E60A /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	DE7C87AD0E40ECDC00E8E60A /* params.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 1344}}";
+			sepNavSelRange = "{1548, 0}";
+			sepNavVisRange = "{1172, 814}";
+			sepNavWindowFrame = "{{38, 113}, {579, 739}}";
+		};
+	};
+	DE7C87AE0E40ECDC00E8E60A /* precision.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 611}}";
+			sepNavSelRange = "{313, 0}";
+			sepNavVisRange = "{0, 321}";
+			sepNavWindowFrame = "{{15, 134}, {579, 739}}";
+		};
+	};
+	DE7C87B20E40ECDC00E8E60A /* fileio.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {632, 1750}}";
+			sepNavSelRange = "{846, 0}";
+			sepNavVisRange = "{535, 1222}";
+			sepNavWindowFrame = "{{61, 92}, {579, 739}}";
+		};
+	};
+	DE7C87B30E40ECDC00E8E60A /* fileio.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 611}}";
+			sepNavSelRange = "{358, 0}";
+			sepNavVisRange = "{0, 737}";
+			sepNavWindowFrame = "{{61, 92}, {579, 739}}";
+		};
+	};
+	DE7C87B40E40ECDC00E8E60A /* fixedgrid.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {720, 5152}}";
+			sepNavSelRange = "{883, 0}";
+			sepNavVisRange = "{807, 481}";
+			sepNavWindowFrame = "{{15, 134}, {579, 739}}";
+		};
+	};
+	DE7C87B50E40ECDC00E8E60A /* fixedgrid.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 1246}}";
+			sepNavSelRange = "{855, 0}";
+			sepNavVisRange = "{187, 1280}";
+			sepNavWindowFrame = "{{43, 118}, {579, 739}}";
+		};
+	};
+	DE7C87B60E40ECDC00E8E60A /* Makefile */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 742}}";
+			sepNavSelRange = "{1982, 0}";
+			sepNavVisRange = "{281, 1936}";
+			sepNavWindowFrame = "{{557, 131}, {579, 739}}";
+		};
+	};
+	DE7C87C20E40ECDC00E8E60A /* saprc99_Initialize.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {595, 1442}}";
+			sepNavSelRange = "{2274, 32}";
+			sepNavVisRange = "{2248, 469}";
+			sepNavWindowFrame = "{{15, 134}, {579, 739}}";
+		};
+	};
+	DE7C87C50E40ECDC00E8E60A /* Makefile.defs */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {644, 3794}}";
+			sepNavSelRange = "{2262, 0}";
+			sepNavVisRange = "{2245, 987}";
+			sepNavWindowFrame = "{{15, 134}, {579, 739}}";
+		};
+	};
+	DE7C87C70E40EDA600E8E60A /* cuda_host.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 644}}";
+			sepNavSelRange = "{296, 0}";
+			sepNavVisRange = "{3, 1675}";
+			sepNavWindowFrame = "{{675, 126}, {579, 739}}";
+		};
+	};
+	DE7C87C80E40EDA600E8E60A /* cuda_host.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {595, 2142}}";
+			sepNavSelRange = "{2429, 86}";
+			sepNavVisRange = "{2005, 962}";
+			sepNavWindowFrame = "{{39, 74}, {579, 739}}";
+		};
+	};
+	DE7C88460E40F6D700E8E60A /* discretize.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 611}}";
+			sepNavSelRange = "{585, 0}";
+			sepNavVisRange = "{0, 593}";
+			sepNavWindowFrame = "{{61, 92}, {579, 739}}";
+		};
+	};
+	DE7C886D0E40F74100E8E60A /* discretize.cu */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {536, 4606}}";
+			sepNavSelRange = "{7037, 0}";
+			sepNavVisRange = "{4849, 1303}";
+			sepNavWindowFrame = "{{602, 135}, {579, 739}}";
+		};
+	};
+	DE7C88AA0E40F89B00E8E60A /* timer.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {595, 1622}}";
+			sepNavSelRange = "{1515, 22}";
+			sepNavVisRange = "{1356, 484}";
+			sepNavWindowFrame = "{{38, 113}, {579, 739}}";
+		};
+	};
+	DE7C88AB0E40F89B00E8E60A /* timer.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 952}}";
+			sepNavSelRange = "{1075, 2}";
+			sepNavVisRange = "{460, 835}";
+			sepNavWindowFrame = "{{38, 113}, {579, 739}}";
+		};
+	};
+	DE7C88AC0E40F8A700E8E60A /* common.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 611}}";
+			sepNavSelRange = "{595, 0}";
+			sepNavVisRange = "{0, 980}";
+			sepNavWindowFrame = "{{15, 134}, {579, 739}}";
+		};
+	};
+	DED4051F0E410AD700888D86 /* fixedgrid */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+			"PBXLSLaunchAction-0" = {
+				PBXLSLaunchAction = 0;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXLSRunLaunchConfig;
+				commandLineArgs = (
+				);
+				displayName = "Executable Runner";
+				environment = {
+				};
+				identifier = com.apple.Xcode.launch.runConfig;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+			{
+				active = YES;
+				name = DYLD_LIBRARY_PATH;
+				value = /usr/local/cuda/lib;
+			},
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		launchableReference = DED405200E410AD700888D86 /* fixedgrid */;
+		libgmallocEnabled = 0;
+		name = fixedgrid;
+		sourceDirectories = (
+		);
+		startupPath = "<<ProjectDirectory>>";
+	};
+	DED405200E410AD700888D86 /* fixedgrid */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = "compiled.mach-o.executable";
+		name = fixedgrid;
+		path = bin/macosx/release/fixedgrid;
+		sourceTree = SOURCE_ROOT;
+	};
+	DED409C90E4349EE00888D86 /* transport.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 1414}}";
+			sepNavSelRange = "{1248, 0}";
+			sepNavVisRange = "{146, 1383}";
+			sepNavWindowFrame = "{{9, 134}, {579, 739}}";
+		};
+	};
+	DED409CA0E4349EE00888D86 /* transport.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 611}}";
+			sepNavSelRange = "{267, 0}";
+			sepNavVisRange = "{0, 408}";
+			sepNavWindowFrame = "{{714, 105}, {579, 739}}";
+		};
+	};
+	DED40A090E434EF200888D86 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = DED409C90E4349EE00888D86 /* transport.c */;
+	};
+	DED40A270E434FFB00888D86 /* cuda_grid.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {520, 588}}";
+			sepNavSelRange = "{351, 0}";
+			sepNavVisRange = "{0, 417}";
+			sepNavWindowFrame = "{{15, 134}, {579, 739}}";
+		};
+	};
+	DED40A400E435BE200888D86 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = DE7C886D0E40F74100E8E60A /* discretize.cu */;
+	};
+	DED40A5F0E4363FE00888D86 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = DE7C886D0E40F74100E8E60A /* discretize.cu */;
+		name = "discretize.cu: 252";
+		rLen = 0;
+		rLoc = 7037;
+		rType = 0;
+		vrLen = 1303;
+		vrLoc = 4849;
+	};
+	DED40A600E4363FE00888D86 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = DED409C90E4349EE00888D86 /* transport.c */;
+		name = "transport.c: 38";
+		rLen = 0;
+		rLoc = 1248;
+		rType = 0;
+		vrLen = 1383;
+		vrLoc = 146;
+	};
+}
