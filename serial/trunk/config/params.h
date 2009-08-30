@@ -18,7 +18,7 @@
 #define OUTPUT_DIR  "Output"
 
 /* 1 for double precision, 0 for single */
-#define DOUBLE_PRECISION 1
+#define DOUBLE_PRECISION 0
 
 /* 1 to write output each iteration */
 #define WRITE_EACH_ITER 0
@@ -44,7 +44,7 @@
 
 #define END_YEAR    2000
 #define END_DOY     100
-#define END_HOUR    24
+#define END_HOUR    1
 #define END_MIN     0
 
 /* Timestep size (sec) */
@@ -66,8 +66,8 @@
 #define O3_INIT     8.61E+09
 
 /* Matrix dimensions */
-#define NY          128
-#define NX          128
+#define NY          2048
+#define NX          2048
 #define NZ          4
 
 /* Cell dimensions */

@@ -23,16 +23,16 @@
 #define DOUBLE_PRECISION 0
 
 /* 1 to write output each iteration */
-#define WRITE_EACH_ITER 1
+#define WRITE_EACH_ITER 0
 
 /* 1 to discretize along the x axis each iteration */
 #define DO_X_DISCRET 1
 
 /* 1 to discretize along the y axis each iteration */
-#define DO_Y_DISCRET 0
+#define DO_Y_DISCRET 1
 
 /* 1 to discretize along the z axis each iteration */
-#define DO_Z_DISCRET 0
+#define DO_Z_DISCRET 1
 
 /* 1 to run chemical mechanism each iteration,
  * otherwise only process ozone */
@@ -46,7 +46,7 @@
 
 #define END_YEAR    2000
 #define END_DOY     100
-#define END_HOUR    1
+#define END_HOUR    24
 #define END_MIN     0
 
 /* Timestep size (sec) */
@@ -68,8 +68,8 @@
 #define O3_INIT     8.61E+09
 
 /* Matrix dimensions */
-#define NX          160
-#define NY          160
+#define NX          2048
+#define NY          2048
 #define NZ          4
 
 /* Cell dimensions */
@@ -80,7 +80,7 @@
 /* Emission source point coordinates */
 #define SOURCE_X    100
 #define SOURCE_Y    100
-#define SOURCE_Z    1
+#define SOURCE_Z    2
 
 /* Emission source emission rate (mol/m^2/s) */
 #define SOURCE_RATE	4.67E+23
