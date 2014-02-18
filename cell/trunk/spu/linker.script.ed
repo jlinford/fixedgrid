@@ -1,0 +1,15 @@
+/ \.text /
+/\*(\.text/
+s/\*(\.text/*( EXCLUDE_FILE(*.o) .text/
+/} =0/
+a
+  OVERLAY :
+  {
+    .segment1 {transport.o(.text) discretize.o(.text)}
+    .segment2 {chemistry.o(.text) saprc99_Function.o(text) 
+               saprc99_Integrator.o(text) saprc99_Jacobian.o(text) 
+               saprc99_JacobianSP.o(text) saprc99_LinearAlgebra.o(text) 
+               saprc99_Rates.o(text) saprc99_Monitor.o(text)}
+  }
+.
+w

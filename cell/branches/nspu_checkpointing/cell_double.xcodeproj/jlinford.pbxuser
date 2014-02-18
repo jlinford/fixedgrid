@@ -1,0 +1,343 @@
+// !$*UTF8*$!
+{
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeArchitecture = i386;
+		activeBuildConfigurationName = Release;
+		activeExecutable = DE120E630DAD6C8D00E37EA1 /* fixedgrid */;
+		activeTarget = D28A88AD04BDD90700651E21 /* cell_double */;
+		addToTargets = (
+			D28A88AD04BDD90700651E21 /* cell_double */,
+		);
+		breakpoints = (
+		);
+		codeSenseManager = DE120E210DAD62C500E37EA1 /* Code sense */;
+		executables = (
+			DE120E630DAD6C8D00E37EA1 /* fixedgrid */,
+		);
+		perUserDictionary = {
+			PBXPerProjectTemplateStateSaveDate = 231278125;
+			PBXWorkspaceStateSaveDate = 231278125;
+		};
+		sourceControlManager = DE120E200DAD62C500E37EA1 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	D28A88AD04BDD90700651E21 /* cell_double */ = {
+		activeExec = 0;
+	};
+	DE120E200DAD62C500E37EA1 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+		};
+	};
+	DE120E210DAD62C500E37EA1 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	DE120E370DAD69BB00E37EA1 /* saprc99_Initialize.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 1428}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{2323, 1410}";
+			sepNavWindowFrame = "{{15, 105}, {715, 768}}";
+		};
+	};
+	DE120E3A0DAD69BB00E37EA1 /* saprc99_Global.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 784}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{557, 2736}";
+			sepNavWindowFrame = "{{15, 105}, {715, 768}}";
+		};
+	};
+	DE120E3B0DAD69BB00E37EA1 /* saprc99.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 640}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 202}";
+			sepNavWindowFrame = "{{15, 105}, {715, 768}}";
+		};
+	};
+	DE120E3C0DAD69BB00E37EA1 /* saprc99_Main.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 1470}}";
+			sepNavSelRange = "{3530, 0}";
+			sepNavVisRange = "{2927, 1052}";
+			sepNavWindowFrame = "{{15, 105}, {715, 768}}";
+		};
+	};
+	DE120E3F0DAD69BB00E37EA1 /* Makefile */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 640}}";
+			sepNavSelRange = "{182, 0}";
+			sepNavVisRange = "{0, 792}";
+			sepNavWindowFrame = "{{15, 105}, {715, 768}}";
+		};
+	};
+	DE120E420DAD69BB00E37EA1 /* saprc99_Rates.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {720, 5964}}";
+			sepNavSelRange = "{1943, 6}";
+			sepNavVisRange = "{0, 0}";
+		};
+	};
+	DE120E450DAD69BB00E37EA1 /* common.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 1176}}";
+			sepNavSelRange = "{992, 0}";
+			sepNavVisRange = "{595, 873}";
+			sepNavWindowFrame = "{{723, 110}, {715, 768}}";
+		};
+	};
+	DE120E470DAD69BB00E37EA1 /* params_15x15x24.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 826}}";
+			sepNavSelRange = "{897, 0}";
+			sepNavVisRange = "{538, 525}";
+		};
+	};
+	DE120E480DAD69BB00E37EA1 /* params_640x192x1.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 924}}";
+			sepNavSelRange = "{1019, 0}";
+			sepNavVisRange = "{662, 532}";
+		};
+	};
+	DE120E490DAD69BB00E37EA1 /* params_640x640x1.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 756}}";
+			sepNavSelRange = "{815, 0}";
+			sepNavVisRange = "{21, 550}";
+		};
+	};
+	DE120E4A0DAD69BB00E37EA1 /* params_40x12x1.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 1022}}";
+			sepNavSelRange = "{1119, 0}";
+			sepNavVisRange = "{778, 538}";
+		};
+	};
+	DE120E4B0DAD69BB00E37EA1 /* params.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 1022}}";
+			sepNavSelRange = "{1120, 0}";
+			sepNavVisRange = "{778, 542}";
+			sepNavWindowFrame = "{{61, 80}, {670, 751}}";
+		};
+	};
+	DE120E4D0DAD69BB00E37EA1 /* fixedgrid.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {854, 5180}}";
+			sepNavSelRange = "{1041, 0}";
+			sepNavVisRange = "{570, 969}";
+			sepNavWindowFrame = "{{1, 111}, {698, 767}}";
+		};
+	};
+	DE120E4E0DAD69BB00E37EA1 /* fixedgrid.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 1176}}";
+			sepNavSelRange = "{677, 0}";
+			sepNavVisRange = "{453, 1568}";
+			sepNavWindowFrame = "{{1, 109}, {715, 768}}";
+		};
+	};
+	DE120E4F0DAD69BB00E37EA1 /* Makefile */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 640}}";
+			sepNavSelRange = "{788, 0}";
+			sepNavVisRange = "{0, 1195}";
+			sepNavWindowFrame = "{{15, 105}, {715, 768}}";
+		};
+	};
+	DE120E500DAD69BB00E37EA1 /* spe_pthread.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {668, 2016}}";
+			sepNavSelRange = "{996, 0}";
+			sepNavVisRange = "{624, 983}";
+			sepNavWindowFrame = "{{719, 132}, {689, 746}}";
+		};
+	};
+	DE120E510DAD69BB00E37EA1 /* spe_pthread.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 966}}";
+			sepNavSelRange = "{954, 0}";
+			sepNavVisRange = "{371, 1033}";
+			sepNavWindowFrame = "{{1, 110}, {715, 768}}";
+		};
+	};
+	DE120E530DAD69BB00E37EA1 /* fixedgrid_spu.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {608, 854}}";
+			sepNavSelRange = "{451, 0}";
+			sepNavVisRange = "{0, 1084}";
+			sepNavWindowFrame = "{{701, 113}, {667, 751}}";
+		};
+	};
+	DE120E550DAD69BB00E37EA1 /* discretize.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {611, 623}}";
+			sepNavSelRange = "{247, 0}";
+			sepNavVisRange = "{0, 750}";
+			sepNavWindowFrame = "{{38, 101}, {670, 751}}";
+		};
+	};
+	DE120E560DAD69BB00E37EA1 /* timer.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {720, 1246}}";
+			sepNavSelRange = "{469, 11}";
+			sepNavVisRange = "{331, 258}";
+			sepNavWindowFrame = "{{15, 122}, {670, 751}}";
+		};
+	};
+	DE120E570DAD69BB00E37EA1 /* fixedgrid_spu.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {758, 6538}}";
+			sepNavSelRange = "{9045, 0}";
+			sepNavVisRange = "{5072, 1171}";
+			sepNavWindowFrame = "{{15, 122}, {667, 751}}";
+		};
+	};
+	DE120E580DAD69BB00E37EA1 /* discretize.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {674, 2226}}";
+			sepNavSelRange = "{5291, 0}";
+			sepNavVisRange = "{4433, 1416}";
+			sepNavWindowFrame = "{{16, 119}, {667, 751}}";
+		};
+	};
+	DE120E5A0DAD69BB00E37EA1 /* memory.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 640}}";
+			sepNavSelRange = "{358, 0}";
+			sepNavVisRange = "{0, 814}";
+			sepNavWindowFrame = "{{746, 110}, {715, 768}}";
+		};
+	};
+	DE120E5B0DAD69BB00E37EA1 /* fileio.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 2520}}";
+			sepNavSelRange = "{1589, 2}";
+			sepNavVisRange = "{1053, 808}";
+			sepNavWindowFrame = "{{1, 110}, {715, 768}}";
+		};
+	};
+	DE120E5D0DAD69BB00E37EA1 /* fileio.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 640}}";
+			sepNavSelRange = "{694, 20}";
+			sepNavVisRange = "{0, 892}";
+			sepNavWindowFrame = "{{715, 110}, {715, 768}}";
+		};
+	};
+	DE120E5E0DAD69BB00E37EA1 /* timer.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {720, 1288}}";
+			sepNavSelRange = "{469, 11}";
+			sepNavVisRange = "{351, 283}";
+			sepNavWindowFrame = "{{15, 122}, {667, 751}}";
+		};
+	};
+	DE120E5F0DAD69BB00E37EA1 /* memory.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {656, 644}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1043}";
+			sepNavWindowFrame = "{{23, 99}, {715, 768}}";
+		};
+	};
+	DE120E600DAD69BB00E37EA1 /* timer.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {720, 658}}";
+			sepNavSelRange = "{547, 11}";
+			sepNavVisRange = "{488, 295}";
+			sepNavWindowFrame = "{{730, 127}, {670, 751}}";
+		};
+	};
+	DE120E630DAD6C8D00E37EA1 /* fixedgrid */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+			YES,
+			YES,
+		);
+		argumentStrings = (
+			./fixedgrid,
+			"/home/jlinford/workspace/fixedgrid/cell_double\n/home/jlinford/workspace/fixedgrid/cell_double",
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+			"PBXLSLaunchAction-0" = {
+				PBXLSLaunchAction = 0;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXLSRunLaunchConfig;
+				commandLineArgs = (
+				);
+				displayName = "Executable Runner";
+				environment = {
+				};
+				identifier = com.apple.Xcode.launch.runConfig;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+			"PBXLSLaunchAction-1" = {
+				PBXLSLaunchAction = 1;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 1;
+				PBXLSLaunchStyle = 1;
+				class = PBXGDB_LaunchConfig;
+				commandLineArgs = (
+				);
+				displayName = GDB;
+				environment = {
+				};
+				identifier = com.apple.Xcode.launch.GDBMI_Config;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+		};
+		customDataFormattersEnabled = 1;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		launchableReference = DE120E640DAD6C8D00E37EA1 /* run_on_cell */;
+		libgmallocEnabled = 0;
+		name = fixedgrid;
+		savedGlobals = {
+		};
+		sourceDirectories = (
+		);
+		startupPath = "<<ProductDirectory>>";
+	};
+	DE120E640DAD6C8D00E37EA1 /* run_on_cell */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = text.script.sh;
+		name = run_on_cell;
+		path = /Users/jlinford/bin/run_on_cell;
+		sourceTree = "<absolute>";
+	};
+	DEAECEBE0DC8F74C00299158 /* precision.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {770, 630}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 687}";
+			sepNavWindowFrame = "{{231, 95}, {630, 758}}";
+		};
+	};
+	DEAECEBF0DC8F77400299158 /* params_1000x700x1.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {768, 1022}}";
+			sepNavSelRange = "{1120, 0}";
+			sepNavVisRange = "{780, 540}";
+			sepNavWindowFrame = "{{38, 94}, {630, 758}}";
+		};
+	};
+}

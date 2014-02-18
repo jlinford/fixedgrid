@@ -1,0 +1,26 @@
+# Version should be "2" or "3"
+SDKVERSION := 2
+
+# Compilers should be "xlc" or "gcc"
+PPU_COMPILER := gcc
+SPU_COMPILER := gcc
+
+# Change default optimization level
+ifndef CC_OPT_LEVEL
+    CC_OPT_LEVEL := -O5
+endif
+
+# Include the correct make.footer
+ifeq ($(SDKVERSION),2)
+	ifdef CELL_TOP
+		include $(CELL_TOP)/make.footer
+	else
+		include /opt/ibm/cell-sdk/prototype/make.footer
+	endif
+else
+	ifdef CELL_TOP
+		include $(CELL_TOP)/buildutils/make.footer
+	else
+		include /opt/cell/sdk/buildutils/make.footer
+	endif
+endif
