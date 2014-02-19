@@ -1,5 +1,9 @@
 
+ifndef TAU_MAKEFILE
 CXX = g++
+else
+CXX = tau_cxx.sh -optTauSelectFile=select.tau
+endif
 CXXFLAGS = -O3 -g
 CPPFLAGS = -I.
 
