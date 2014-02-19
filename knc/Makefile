@@ -4,11 +4,11 @@ CXX = g++
 else
 CXX = tau_cxx.sh -optTauSelectFile=select.tau
 endif
-CXXFLAGS = -O3 -g
+CXXFLAGS = -O3 -g -fopenmp
 CPPFLAGS = -I.
 
 LD = $(CXX)
-LDFLAGS =
+LDFLAGS = -fopenmp
 LIBS = -lm
 
 RM = /bin/rm -f

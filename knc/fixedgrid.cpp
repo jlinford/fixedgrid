@@ -206,6 +206,7 @@ void Model::discretize_rows(real_t dt)
     real_t wbound[4];
     real_t dbound[4];
 
+    #pragma omp parallel for private(buff, cbound, wbound, dbound) default(shared)
     for (int i = 0; i < nrows; i++) {
       buffer_timer.start();
       cbound[0] = conc[i][ncols - 2];
@@ -253,6 +254,7 @@ void Model::discretize_cols(real_t dt)
     real_t wbound[4];
     real_t dbound[4];
 
+    #pragma omp parallel for private(ccol, wcol, dcol, buff, cbound, wbound, dbound) default(shared)
     for (int j = 0; j < ncols; j++) {
       buffer_timer.start();
       for (int i = 0; i < nrows; i++) {
@@ -284,6 +286,5 @@ void Model::discretize_cols(real_t dt)
     discret_timer.stop();
   }
 }
-
 
 } // namespace fixedgrid
