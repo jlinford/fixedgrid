@@ -52,8 +52,8 @@ public:
 	 * Both the coordinates and the data values in a binary input are treated
 	 * as single precision floats. Example commands for plotting non-uniform matrix data:
 	 *
-	 *     splot ’file’ nonuniform matrix using 1:2:3  # ascii input
-	 *     splot ’file’ binary matrix using 1:2:3      # binary input
+	 *     splot 'file' nonuniform matrix using 1:2:3  # ascii input
+	 *     splot 'file' binary matrix using 1:2:3      # binary input
 	 *
 	 * Thus the data organization for non-uniform matrix input is
 	 *
@@ -97,7 +97,7 @@ public:
 			buffer[j+1] = (float)j;
 		}
 		if (fwrite(buffer, sizeof(float), nmemb, fout) != nmemb) {
-			fprintf(stderr, "ERROR: Failed to write %d elements to '%s'\n", nmemb, fname);
+			fprintf(stderr, "ERROR: Failed to write %ld elements to '%s'\n", nmemb, fname);
 			return -1;
 		}
 
@@ -108,7 +108,7 @@ public:
 				buffer[j+1] = (float)rows[i][j];
 			}
 			if (fwrite(buffer, sizeof(float), nmemb, fout) != nmemb) {
-				fprintf(stderr, "ERROR: Failed to write %d elements to '%s'\n", nmemb, fname);
+				fprintf(stderr, "ERROR: Failed to write %ld elements to '%s'\n", nmemb, fname);
 				return -1;
 			}
 		}

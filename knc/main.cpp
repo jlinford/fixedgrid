@@ -5,6 +5,10 @@
 
 #include "fixedgrid.hpp"
 
+#define HOURS 3600
+#define MINUTES 60
+#define SECONDS 1
+
 using namespace std;
 using namespace fixedgrid;
 
@@ -21,11 +25,11 @@ static real_t const dy = 1000;
 static real_t const dz = 1000;
 
 /* Timespan */
-static SimpleDate const start_time(2000, 100, 0, 0, 0);
-static SimpleDate const end_time(2000, 100, 1, 0, 0);
+static real_t const tstart = 0*HOURS + 0*MINUTES + 0*SECONDS;
+static real_t const tend = 12*HOURS + 0*MINUTES + 0*SECONDS;
 
 /* Timestep size (sec) */
-static real_t const step_size = 50;
+static real_t const dt = 50;
 
 /* Initial O3 concentration */
 static real_t const conc_init = 8.61E+09;
@@ -52,7 +56,7 @@ int main(int argc, char** argv)
     m.AddPlume(4.67E+23, 300, 300);
 
     /* Print startup banner */
-    double span_seconds = end_time.seconds() - start_time.seconds();
+    double tspan = tend - tstart;
     cout << "\n"
 		 << "CONFIGURATION:\n"
 		 << "    ROW DISCRETIZATION:    " << m.AreRowsDiscretized() << "\n"
@@ -65,26 +69,26 @@ int main(int argc, char** argv)
 		 << "    DEPTH  (Z): " << dz << "meters\n"
 		 << "\n"
 		 << "TIME SPAN:\n"
-		 << "    " << span_seconds << " seconds \n"
-		 << "    " << (int)ceil(span_seconds / step_size) << " timesteps of " << step_size << " seconds\n"
+		 << "    " << tspan << " seconds \n"
+		 << "    " << (int)ceil(tspan / dt) << " timesteps of " << dt << " seconds\n"
 		 << "\n";
     
     /* Store initial concentration */
     cout << "Writing initial concentration...";
-    m.WriteGnuplotBinaryMatrixFile();
+    m.WriteConcToFile();
     cout << " done." << endl;
     
     /* Iterate */
-    m.Step(start_time, end_time, step_size);
+    m.Step(tstart, tend, dt);
+
+    /* Show final time */
+    cout << "Final time: " << m.GetTime() << " seconds.\n" << endl;
 
     /* Store final concentration */
     cout << "Writing final concentration...";
-    //m.conc.SaveToFile();
+    m.WriteConcToFile();
     cout << " done." << endl;
 
-    /* Show final time */
-    //cout << "Final time: " << m.GetModelTime() << " seconds.\n" << endl;
-    
     /* Show metrics */
     cout << m.GetMetrics();
 

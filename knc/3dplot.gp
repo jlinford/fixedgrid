@@ -1,4 +1,4 @@
-#!/usr/bin/gnuplot -persist
+#!/usr/bin/env gnuplot -persist
 #
 #    
 #    	G N U P L O T
@@ -43,7 +43,7 @@ set style fill  empty border
 set style rectangle back fc lt -3 fillstyle   solid 1.00 border lt -1
 set style circle radius graph 0.02, first 0, 0 
 set style ellipse size graph 0.05, 0.03, first 0 angle 0 units xy
-set dgrid3d 60,60, 1
+set dgrid3d 30,30, 1
 set dummy x,y
 set format x "% g"
 set format y "% g"
@@ -127,13 +127,13 @@ set rrange [ * : * ] noreverse nowriteback
 set trange [ * : * ] noreverse nowriteback
 set urange [ * : * ] noreverse nowriteback
 set vrange [ * : * ] noreverse nowriteback
-set xlabel "X Grid" 
+set xlabel "Meters" 
 set xlabel  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  offset character 0, 0, 0 font "" textcolor lt -1 norotate
 set xrange [ * : * ] noreverse nowriteback
 set x2range [ * : * ] noreverse nowriteback
-set ylabel "Y Grid" 
+set ylabel "Meters" 
 set ylabel  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
 set y2label "" 
 set y2label  offset character 0, 0, 0 font "" textcolor lt -1 rotate by -270
@@ -164,6 +164,5 @@ set fontpath
 set psdir
 set fit noerrorvariables
 GNUTERM = "qt"
-#splot 'fixedgrid.dat' binary w pm3d notitle
 splot '/dev/stdin' binary w pm3d notitle
 #    EOF
