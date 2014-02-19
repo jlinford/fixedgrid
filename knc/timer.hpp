@@ -1,5 +1,5 @@
 /*
- *  timer.h
+ *  timer.hpp
  *  
  *  Common timer functionality
  *
@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef __TIMER_H__
-#define __TIMER_H__
+#ifndef __TIMER_HPP__
+#define __TIMER_HPP__
 
 #include <iostream>
 #include <string>
@@ -56,10 +56,6 @@ public:
 
 	Timer & operator[](std::string const & name) {
 		return timers[name];
-	}
-
-	Timer const & operator[](std::string const & name) const {
-		return timers.at(name);
 	}
 
 	friend std::ostream & operator<<(std::ostream & os, Metrics const & m);

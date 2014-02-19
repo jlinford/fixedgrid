@@ -150,8 +150,6 @@ void Model::Step(SimpleDate const & start_time, SimpleDate const & end_time, rea
 	/* Time span */
 	real_t span = end_time.seconds() - start_time.seconds();
 
-	printf("span=%g, dt=%g\n", span, dt);
-
 	size_t step = 0;
 	for(real_t time=0; time < span; time+=dt) {
 		printf("  Step %02d: Time = %07.2f sec.\n", step, time);

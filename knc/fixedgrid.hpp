@@ -9,8 +9,6 @@
 #ifndef __FIXEDGRID_HPP__
 #define __FIXEDGRID_HPP__
 
-#include <string>
-#include <utility>
 #include "timer.hpp"
 
 
