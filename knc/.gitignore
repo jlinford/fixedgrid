@@ -2,4 +2,10 @@
 .cproject
 .settings
 *.o
+*.eps
+*.pdf
+*.png
+profile.*
+*.ppk
+*.dat
 fixedgrid

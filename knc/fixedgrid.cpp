@@ -6,8 +6,10 @@
  *
  */
 
-#include <cstdio>
+#include <iostream>
 #include "fixedgrid.hpp"
+
+using namespace std;
 
 namespace fixedgrid {
 
@@ -150,9 +152,8 @@ void Model::Step(SimpleDate const & start_time, SimpleDate const & end_time, rea
 	/* Time span */
 	real_t span = end_time.seconds() - start_time.seconds();
 
-	size_t step = 0;
 	for(real_t time=0; time < span; time+=dt) {
-		printf("  Step %02d: Time = %07.2f sec.\n", step, time);
+		cout << "  Step " << step << ": Time = " << time << endl;
 
 		discretize_rows(dt);
 		discretize_cols(dt);
@@ -278,5 +279,6 @@ void Model::discretize_cols(real_t dt)
 		discret_timer.stop();
 	}
 }
+
 
 } // namespace fixedgrid

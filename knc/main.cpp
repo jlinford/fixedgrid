@@ -71,7 +71,7 @@ int main(int argc, char** argv)
     
     /* Store initial concentration */
     cout << "Writing initial concentration...";
-    //m.conc.SaveToFile();
+    m.WriteGnuplotBinaryMatrixFile();
     cout << " done." << endl;
     
     /* Iterate */
