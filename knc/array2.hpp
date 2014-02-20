@@ -38,10 +38,10 @@ public:
 		delete[] data;
 	}
 
-	element_type * const operator[](size_t i) {
+	element_type * operator[](size_t i) {
 		return rows[i];
 	}
-	element_type const * const operator[](size_t i) const {
+	element_type const * operator[](size_t i) const {
 		return rows[i];
 	}
 

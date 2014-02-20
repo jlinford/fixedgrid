@@ -58,7 +58,7 @@ public:
     return metrics;
   }
 
-  real_t const GetTime() const {
+  real_t GetTime() const {
     return time;
   }
 
