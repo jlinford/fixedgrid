@@ -66,22 +66,22 @@ int main(int argc, char** argv)
   /* Print startup banner */
   double tspan = tend - tstart;
   cout << "\n"
-    << "CONFIGURATION:\n"
-    << "    ROW DISCRETIZATION:    " << m.AreRowsDiscretized() << "\n"
-    << "    COLUMN DISCRETIZATION: " << m.AreColsDiscretized() << "\n"
-    << "    sizeof(real_t):        " << sizeof(real_t) << "\n"
-                                        << "\n"
-                                        << "SPACE DOMAIN:\n"
-                                        << "    LENGTH (X): " << ncols*dx << " meters\n"
-                                                                 << "    WIDTH  (Y): " << nrows*dy << " meters\n"
-                                                                                          << "    DEPTH  (Z): " << dz << "meters\n"
-                                                                                                                   << "\n"
-                                                                                                                   << "TIME SPAN:\n"
-                                                                                                                   << "    " << tspan << " seconds \n"
-                                                                                                                   << "    " << (int)ceil(tspan / dt) << " timesteps of " << dt << " seconds\n";
+       << "CONFIGURATION:\n"
+       << "    ROW DISCRETIZATION:    " << m.AreRowsDiscretized() << "\n"
+       << "    COLUMN DISCRETIZATION: " << m.AreColsDiscretized() << "\n"
+       << "    sizeof(real_t):        " << sizeof(real_t) << "\n"
+       << "\n"
+       << "SPACE DOMAIN:\n"
+       << "    LENGTH (X): " << ncols*dx << " meters\n"
+       << "    WIDTH  (Y): " << nrows*dy << " meters\n"
+       << "    DEPTH  (Z): " << dz << " meters\n"
+       << "\n"
+       << "TIME SPAN:\n"
+       << "    " << tspan << " seconds \n"
+       << "    " << (int)ceil(tspan / dt) << " timesteps of " << dt << " seconds\n";
 #ifdef _OPENMP
   cout << "OpenMP:\n"
-    << "    OMP_NUM_THREADS: " << omp_get_max_threads() << "\n";
+       << "    OMP_NUM_THREADS: " << omp_get_max_threads() << "\n";
 #endif
   cout << endl;
 
