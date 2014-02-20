@@ -1,15 +1,35 @@
 
+TIMERS_ENABLED = 0
+
 ifndef TAU_MAKEFILE
-CXX = g++
+  CXX = icpc
 else
-CXX = tau_cxx.sh -optTauSelectFile=select.tau
+  CXX = tau_cxx.sh -optTauSelectFile=select.tau
 endif
-CXXFLAGS = -O3 -g -fopenmp
-CPPFLAGS = -I.
+
+ifdef MIC_OFFLOAD
+  MIC_CXXFLAGS = -xhost
+  MIC_LDFLAGS =
+else
+  MIC_CXXFLAGS = -mmic
+  MIC_LDFLAGS = -mmic
+endif
+
+REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report5
+OPT_CXXFLAGS = -O3 -g -openmp
 
 LD = $(CXX)
-LDFLAGS = -fopenmp
+REPORT_LDFLAGS = -opt-report-phase=offload -vec-report5
+OPT_LDFLAGS = -O3 -g -openmp
+
 LIBS = -lm
+
+################################################################################
+
+CXXFLAGS = $(OPT_CXXFLAGS) $(MIC_CXXFLAGS) $(REPORT_CXXFLAGS)
+LDFLAGS = $(OPT_LDFLAGS) $(MIC_LDFLAGS) $(REPORT_LDFLAGS)
+
+CPPFLAGS = -DTIMERS_ENABLED=$(TIMERS_ENABLED) -I.
 
 RM = /bin/rm -f
 
@@ -30,5 +50,5 @@ $(EXE): $(OBJ)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 clean: 
-	$(RM) $(EXE) $(OBJ)
+	$(RM) $(EXE) $(OBJ) *MIC.o
 
