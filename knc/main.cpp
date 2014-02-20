@@ -52,54 +52,62 @@ static real_t const diff_init = 100.0;
  */
 int main(int argc, char** argv)
 {
-    /* Initialize model */
-    Model m(runID, nrows, ncols, dx, dy, dz,
-        conc_init, wind_u_init, wind_v_init, diff_init);
-    
-    /* Add O3 plume */
-    m.AddPlume(4.67E+23, 300, 300);
+  /* Wall clock timer is always used */
+  Timer wall_clock;
+  wall_clock.start();
 
-    /* Print startup banner */
-    double tspan = tend - tstart;
-    cout << "\n"
-         << "CONFIGURATION:\n"
-         << "    ROW DISCRETIZATION:    " << m.AreRowsDiscretized() << "\n"
-         << "    COLUMN DISCRETIZATION: " << m.AreColsDiscretized() << "\n"
-         << "    sizeof(real_t):        " << sizeof(real_t) << "\n"
-         << "\n"
-         << "SPACE DOMAIN:\n"
-         << "    LENGTH (X): " << ncols*dx << " meters\n"
-         << "    WIDTH  (Y): " << nrows*dy << " meters\n"
-         << "    DEPTH  (Z): " << dz << "meters\n"
-         << "\n"
-         << "TIME SPAN:\n"
-         << "    " << tspan << " seconds \n"
-         << "    " << (int)ceil(tspan / dt) << " timesteps of " << dt << " seconds\n";
+  /* Initialize model */
+  Model m(runID, nrows, ncols, dx, dy, dz,
+      conc_init, wind_u_init, wind_v_init, diff_init);
+
+  /* Add O3 plume */
+  m.AddPlume(4.67E+23, 300, 300);
+
+  /* Print startup banner */
+  double tspan = tend - tstart;
+  cout << "\n"
+    << "CONFIGURATION:\n"
+    << "    ROW DISCRETIZATION:    " << m.AreRowsDiscretized() << "\n"
+    << "    COLUMN DISCRETIZATION: " << m.AreColsDiscretized() << "\n"
+    << "    sizeof(real_t):        " << sizeof(real_t) << "\n"
+                                        << "\n"
+                                        << "SPACE DOMAIN:\n"
+                                        << "    LENGTH (X): " << ncols*dx << " meters\n"
+                                                                 << "    WIDTH  (Y): " << nrows*dy << " meters\n"
+                                                                                          << "    DEPTH  (Z): " << dz << "meters\n"
+                                                                                                                   << "\n"
+                                                                                                                   << "TIME SPAN:\n"
+                                                                                                                   << "    " << tspan << " seconds \n"
+                                                                                                                   << "    " << (int)ceil(tspan / dt) << " timesteps of " << dt << " seconds\n";
 #ifdef _OPENMP
-    cout << "OpenMP:\n"
-         << "    OMP_NUM_THREADS: " << omp_get_max_threads() << "\n";
+  cout << "OpenMP:\n"
+    << "    OMP_NUM_THREADS: " << omp_get_max_threads() << "\n";
 #endif
-    cout << endl;
-    
-    /* Store initial concentration */
-    cout << "Writing initial concentration...";
-    m.WriteConcToFile();
-    cout << " done." << endl;
-    
-    /* Iterate */
-    m.Step(tstart, tend, dt);
+  cout << endl;
 
-    /* Show final time */
-    cout << "Final time: " << m.GetTime() << " seconds.\n" << endl;
+  /* Store initial concentration */
+  cout << "Writing initial concentration...";
+  m.WriteConcToFile();
+  cout << " done." << endl;
 
-    /* Store final concentration */
-    cout << "Writing final concentration...";
-    m.WriteConcToFile();
-    cout << " done." << endl;
+  /* Iterate */
+  m.Step(tstart, tend, dt);
 
-    /* Show metrics */
-    cout << m.GetMetrics();
+  /* Show final time */
+  cout << "Final time: " << m.GetTime() << " seconds.\n" << endl;
 
-    /* Cleanup and exit */
-    return 0;
+  /* Store final concentration */
+  cout << "Writing final concentration...";
+  m.WriteConcToFile();
+  cout << " done." << endl;
+
+  /* Show metrics */
+  PRINT_METRICS();
+
+  /* Show wall clock time */
+  wall_clock.stop();
+  cout << "Wall clock: " << wall_clock.value()*1e-6 << endl;
+
+  /* Cleanup and exit */
+  return 0;
 }

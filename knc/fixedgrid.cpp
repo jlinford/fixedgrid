@@ -143,49 +143,50 @@ static inline void discretize(
   }
 }
 
-int Model::WriteConcToFile() {
-  Timer & io_timer = metrics["File I/O"];
-  io_timer.start();
+int Model::WriteConcToFile() 
+{
+  TIMER_START("File I/O");
+
   char buff[512];
   sprintf(buff, "fixedgrid_%03d_%05ld.dat", run_id, step);
   int retval = conc.WriteGnuplotBinaryMatrixFile(buff);
-  io_timer.stop();
+
+  TIMER_STOP("File I/O");
   return retval;
 }
 
 void Model::Step(real_t tstart, real_t tend, real_t dt)
 {
-	Timer & step_timer = metrics["Step"];
-	step_timer.start();
+  TIMER_START("Step");
 
-	for(time=tstart; time < tend; time += dt) {
-		cout << "  Step " << step << ": Time = " << time << endl;
+  for(time=tstart; time < tend; time += dt) {
+    //cout << "  Step " << step << ": Time = " << time << endl;
 
-		discretize_rows(dt);
-		discretize_cols(dt);
-		discretize_rows(dt);
+    discretize_rows(dt);
+    discretize_cols(dt);
+    discretize_rows(dt);
 
-		++step;
+    ++step;
 
-		/*
-		 * Could update wind field here...
-		 */
+    /*
+     * Could update wind field here...
+     */
 
-		/*
-		 * Could update diffusion tensor here...
-		 */
+    /*
+     * Could update diffusion tensor here...
+     */
 
-		/*
-		 * Could update environment here...
-		 */
+    /*
+     * Could update environment here...
+     */
 
-		/* Store concentration */
-		if (write_each_iter) {
-			WriteConcToFile();
-		}
-	}
+    /* Store concentration */
+    if (write_each_iter) {
+      WriteConcToFile();
+    }
+  }
 
-	step_timer.stop();
+  TIMER_STOP("Step");
 }
 
 /**
@@ -194,9 +195,7 @@ void Model::Step(real_t tstart, real_t tend, real_t dt)
 void Model::discretize_rows(real_t dt)
 {
   if (row_discret) {
-    Timer & discret_timer = metrics["Row Discret"];
-    Timer & buffer_timer = metrics["Buffering"];
-    discret_timer.start();
+    TIMER_START("Row Discret");
 
     /* Buffers */
     real_t buff[ncols];
@@ -208,7 +207,7 @@ void Model::discretize_rows(real_t dt)
 
     #pragma omp parallel for private(buff, cbound, wbound, dbound) default(shared)
     for (int i = 0; i < nrows; i++) {
-      buffer_timer.start();
+      TIMER_START("Buffering");
       cbound[0] = conc[i][ncols - 2];
       cbound[1] = conc[i][ncols - 1];
       cbound[2] = conc[i][0];
@@ -221,7 +220,7 @@ void Model::discretize_rows(real_t dt)
       dbound[1] = diff[i][ncols - 1];
       dbound[2] = diff[i][0];
       dbound[3] = diff[i][1];
-      buffer_timer.stop();
+      TIMER_STOP("Buffering");
 
       discretize(ncols, dx, 0.5 * dt, conc[i], wind_u[i], diff[i], cbound, wbound, dbound, buff);
 
@@ -229,7 +228,7 @@ void Model::discretize_rows(real_t dt)
         conc[i][j] = buff[j];
       }
     }
-    discret_timer.stop();
+    TIMER_STOP("Row Discret");
   }
 }
 
@@ -239,9 +238,7 @@ void Model::discretize_rows(real_t dt)
 void Model::discretize_cols(real_t dt)
 {
   if (col_discret) {
-    Timer & discret_timer = metrics["Col Discret"];
-    Timer & buffer_timer = metrics["Buffering"];
-    discret_timer.start();
+    TIMER_START("Col Discret");
 
     /* Buffers */
     real_t ccol[nrows];
@@ -256,7 +253,7 @@ void Model::discretize_cols(real_t dt)
 
     #pragma omp parallel for private(ccol, wcol, dcol, buff, cbound, wbound, dbound) default(shared)
     for (int j = 0; j < ncols; j++) {
-      buffer_timer.start();
+      TIMER_START("Buffering");
       for (int i = 0; i < nrows; i++) {
         ccol[i] = conc[i][j];
         wcol[i] = wind_v[i][j];
@@ -275,7 +272,7 @@ void Model::discretize_cols(real_t dt)
       dbound[1] = dcol[nrows - 1];
       dbound[2] = dcol[0];
       dbound[3] = dcol[1];
-      buffer_timer.stop();
+      TIMER_STOP("Buffering");
 
       discretize(nrows, dy, dt, ccol, wcol, dcol, cbound, wbound, dbound, buff);
 
@@ -283,7 +280,7 @@ void Model::discretize_cols(real_t dt)
         conc[i][j] = buff[i];
       }
     }
-    discret_timer.stop();
+    TIMER_STOP("Col Discret");
   }
 }
 

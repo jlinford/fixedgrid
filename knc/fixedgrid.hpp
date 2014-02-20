@@ -34,8 +34,7 @@ public:
       conc(nrows, ncols, conc_init),
       wind_u(nrows, ncols, wind_u_init),
       wind_v(nrows, ncols, wind_v_init),
-      diff(nrows, ncols, diff_init),
-      metrics("fixedgrid::Model")
+      diff(nrows, ncols, diff_init)
   { }
 
   ~Model()
@@ -52,10 +51,6 @@ public:
 
   bool AreColsDiscretized() const {
     return col_discret;
-  }
-
-  Metrics const & GetMetrics() const {
-    return metrics;
   }
 
   real_t GetTime() const {
@@ -107,8 +102,6 @@ private:
 
   /* Diffusion tensor field [NROWS][NCOLS] */
   diff_t diff;
-
-  Metrics metrics;
 };
 
 } // namespace fixedgrid
