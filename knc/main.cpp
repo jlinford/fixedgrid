@@ -70,6 +70,9 @@ int main(int argc, char** argv)
        << "    ROW DISCRETIZATION:    " << m.AreRowsDiscretized() << "\n"
        << "    COLUMN DISCRETIZATION: " << m.AreColsDiscretized() << "\n"
        << "    sizeof(real_t):        " << sizeof(real_t) << "\n"
+#ifdef _OPENMP
+       << "    OMP_NUM_THREADS:       " << omp_get_max_threads() << "\n"
+#endif
        << "\n"
        << "SPACE DOMAIN:\n"
        << "    LENGTH (X): " << ncols*dx << " meters\n"
@@ -78,12 +81,8 @@ int main(int argc, char** argv)
        << "\n"
        << "TIME SPAN:\n"
        << "    " << tspan << " seconds \n"
-       << "    " << (int)ceil(tspan / dt) << " timesteps of " << dt << " seconds\n";
-#ifdef _OPENMP
-  cout << "OpenMP:\n"
-       << "    OMP_NUM_THREADS: " << omp_get_max_threads() << "\n";
-#endif
-  cout << endl;
+       << "    " << (int)ceil(tspan / dt) << " timesteps of " << dt << " seconds\n"
+       << endl;
 
   /* Store initial concentration */
   cout << "Writing initial concentration...";
