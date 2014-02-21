@@ -1,0 +1,6 @@
+
+BEGIN_EXCLUDE_LIST
+double fixedgrid::Timer::usec()
+void fixedgrid::space_advec_diff(int, fixedgrid::real_t, const fixedgrid::real_t *, const fixedgrid::real_t *, const fixedgrid::real_t *, const fixedgrid::real_t *, const fixedgrid::real_t *, const fixedgrid::real_t *, fixedgrid::real_t *)
+END_EXCLUDE_LIST
+

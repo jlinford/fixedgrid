@@ -42,7 +42,7 @@ public:
 
   /* Add emission plume (mol/m^3) */
   void AddPlume(real_t plume, size_t row, size_t col) {
-    conc[row][col] += plume / (dx * dy * dz);
+    conc(row, col) += plume / (dx * dy * dz);
   }
 
   bool AreRowsDiscretized() const {

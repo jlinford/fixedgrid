@@ -208,24 +208,24 @@ void Model::discretize_rows(real_t dt)
     #pragma omp parallel for private(buff, cbound, wbound, dbound) default(shared)
     for (int i = 0; i < nrows; i++) {
       TIMER_START("Buffering");
-      cbound[0] = conc[i][ncols - 2];
-      cbound[1] = conc[i][ncols - 1];
-      cbound[2] = conc[i][0];
-      cbound[3] = conc[i][1];
-      wbound[0] = wind_u[i][ncols - 2];
-      wbound[1] = wind_u[i][ncols - 1];
-      wbound[2] = wind_u[i][0];
-      wbound[3] = wind_u[i][1];
-      dbound[0] = diff[i][ncols - 2];
-      dbound[1] = diff[i][ncols - 1];
-      dbound[2] = diff[i][0];
-      dbound[3] = diff[i][1];
+      cbound[0] = conc(i, ncols - 2);
+      cbound[1] = conc(i, ncols - 1);
+      cbound[2] = conc(i, 0);
+      cbound[3] = conc(i, 1);
+      wbound[0] = wind_u(i, ncols - 2);
+      wbound[1] = wind_u(i, ncols - 1);
+      wbound[2] = wind_u(i, 0);
+      wbound[3] = wind_u(i, 1);
+      dbound[0] = diff(i, ncols - 2);
+      dbound[1] = diff(i, ncols - 1);
+      dbound[2] = diff(i, 0);
+      dbound[3] = diff(i, 1);
       TIMER_STOP("Buffering");
 
-      discretize(ncols, dx, 0.5 * dt, conc[i], wind_u[i], diff[i], cbound, wbound, dbound, buff);
+      discretize(ncols, dx, 0.5 * dt, conc(i), wind_u(i), diff(i), cbound, wbound, dbound, buff);
 
       for (int j = 0; j < ncols; j++) {
-        conc[i][j] = buff[j];
+        conc(i, j) = buff[j];
       }
     }
     TIMER_STOP("Row Discret");
@@ -255,9 +255,9 @@ void Model::discretize_cols(real_t dt)
     for (int j = 0; j < ncols; j++) {
       TIMER_START("Buffering");
       for (int i = 0; i < nrows; i++) {
-        ccol[i] = conc[i][j];
-        wcol[i] = wind_v[i][j];
-        dcol[i] = diff[i][j];
+        ccol[i] = conc(i, j);
+        wcol[i] = wind_v(i, j);
+        dcol[i] = diff(i, j);
       }
 
       cbound[0] = ccol[nrows - 2];
@@ -277,7 +277,7 @@ void Model::discretize_cols(real_t dt)
       discretize(nrows, dy, dt, ccol, wcol, dcol, cbound, wbound, dbound, buff);
 
       for (int i = 0; i < nrows; i++) {
-        conc[i][j] = buff[i];
+        conc(i, j) = buff[i];
       }
     }
     TIMER_STOP("Col Discret");
