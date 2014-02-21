@@ -35,9 +35,8 @@ RM = /bin/rm -f
 
 EXE = fixedgrid
 
-SRC = $(wildcard *.cpp)
-HDR = $(wildcard *.hpp)
-OBJ = $(SRC:.cpp=.o)
+SRC = $(wildcard *.F90)
+OBJ = $(SRC:.F90=.o)
 
 .PHONY: all clean
 
@@ -46,9 +45,9 @@ all: $(EXE)
 $(EXE): $(OBJ)
 	$(LD) $(LDFLAGS) $(OBJ) -o $(EXE) $(LIBS)
 
-%.o: %.cpp $(HDR)
+%.o: %.F90
 	$(F90) $(CPPFLAGS) $(F90FLAGS) -c $< -o $@
 
 clean: 
-	$(RM) $(EXE) $(OBJ) *MIC.o
+	$(RM) $(EXE) $(OBJ) *MIC.o *.mod
 

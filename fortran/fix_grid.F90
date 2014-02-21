@@ -57,10 +57,9 @@ program  fix_grid
   conc(:,:)=O3_intial;
 
   minstp = 1
-  maxstp = 500 ![Final time = maxstp*dt]
   time=0.0
   !! 12.0
-  FinalTime=12.0*3600.0
+  FinalTime=1.0*3600.0
   dt=50 ![sec]
   maxstp=INT((FinalTime-time)/dt)
   !maxstp=100
@@ -214,7 +213,7 @@ program  fix_grid
   
   stop
 
-2020 FORMAT(E22.16,2X,E22.16,2X,100(E22.16,2X,))
+2020 FORMAT(E22.16,2X,E22.16,2X,100(E22.16,2X))
 4040 FORMAT(I4,2X,I4,2X,E22.16,2X,E22.16,2X,E22.16,2X,E22.16)
 end program fix_grid
 

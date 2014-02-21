@@ -2,6 +2,8 @@
 .cproject
 .settings
 *.o
+*.mod
+*.so
 *.eps
 *.pdf
 *.png
@@ -9,3 +11,4 @@ profile.*
 *.ppk
 *.dat
 fixedgrid
+fortran/OUT_*
