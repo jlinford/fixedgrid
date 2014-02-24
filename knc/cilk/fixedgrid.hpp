@@ -59,9 +59,9 @@ public:
     return time;
   }
 
-  int WriteConcToFile();
-
   void Step(real_t tstart, real_t tend, real_t dt);
+
+  void WriteConcFile(void);
 
 private:
 
@@ -79,6 +79,8 @@ private:
     }
     return (matrix_t)memptr;
   }
+
+  int WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname);
 
   /* Discretize rows a half timestep */
   void discretize_rows(real_t dt);
@@ -248,18 +250,90 @@ static inline void discretize(
   conc_out[:] = 0.5 * (conc_out[:] + c[:]);
 }
 
+/*
+  * From gnuplot/doc/html/gnuplot.html:
+  * For binary input data, the first element of the first row must contain
+  * the number of data columns. (This number is ignored for ascii input).
+  * Both the coordinates and the data values in a binary input are treated
+  * as single precision floats. Example commands for plotting non-uniform matrix data:
+  *
+  *     splot 'file' nonuniform matrix using 1:2:3  # ascii input
+  *     splot 'file' binary matrix using 1:2:3      # binary input
+  *
+  * Thus the data organization for non-uniform matrix input is
+  *
+  *      <N+1>  <y0>   <y1>   <y2> ...  <yN>
+  *      <x0> <z0,0> <z0,1> <z0,2> ... <z0,N>
+  *      <x1> <z1,0> <z1,1> <z1,2> ... <z1,N>
+  *       :      :      :      :   ...    :
+  *
+  * which is then converted into triplets:
+  *
+  *      <x0> <y0> <z0,0>
+  *      <x0> <y1> <z0,1>
+  *      <x0> <y2> <z0,2>
+  *       :    :     :
+  *      <x0> <yN> <z0,N>
+  *      <x1> <y0> <z1,0>
+  *      <x1> <y1> <z1,1>
+  *       :    :     :
+  *
+  * These triplets are then converted into gnuplot iso-curves and then gnuplot
+  * proceeds in the usual manner to do the rest of the plotting.
+  */
 template < size_t NROWS, size_t NCOLS >
-int Model<NROWS,NCOLS>::WriteConcToFile() 
+int Model<NROWS,NCOLS>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname) 
+{
+  using namespace std;
+
+  // Open file for writing
+  FILE * fout = fopen(fname, "wb");
+  if (!fout) {
+    int err = errno;
+    fprintf(stderr, "ERROR: Can't open '%s' for writing\n", fname);
+    return err;
+  }
+
+  size_t nmemb = NCOLS + 1;
+  float buffer[nmemb];
+
+  // Write ncols and column indices as float values
+  buffer[0] = (float)NCOLS;
+  for (int j=0; j<NCOLS; ++j) {
+    buffer[j+1] = (float)j;
+  }
+  if (fwrite(buffer, sizeof(float), nmemb, fout) != nmemb) {
+    fprintf(stderr, "ERROR: Failed to write %ld elements to '%s'\n", nmemb, fname);
+    return -1;
+  }
+
+  // Write matrix rows
+  for (int i=0; i<NROWS; ++i) {
+    buffer[0] = (float)i;
+    buffer[1:NCOLS] = mat[i][:];
+    if (fwrite(buffer, sizeof(float), nmemb, fout) != nmemb) {
+      fprintf(stderr, "ERROR: Failed to write %ld elements to '%s'\n", nmemb, fname);
+      return -1;
+    }
+  }
+
+  // Cleanup and return
+  fclose(fout);
+  return 0;
+}
+
+template < size_t NROWS, size_t NCOLS >
+void Model<NROWS,NCOLS>::WriteConcFile(void)
 {
   TIMER_START("File I/O");
 
-  char buff[512];
-  sprintf(buff, "fixedgrid_%03d_%05ld.dat", run_id, step);
-  //int retval = conc.WriteGnuplotBinaryMatrixFile(buff);
-  int retval = 0;
+  // Build filename
+  char fname[512];
+  sprintf(fname, "fixedgrid_%03d_%05ld.dat", run_id, step);
+
+  WriteGnuplotBinaryMatrixFile(conc, fname);
 
   TIMER_STOP("File I/O");
-  return retval;
 }
 
 template < size_t NROWS, size_t NCOLS >
@@ -290,7 +364,7 @@ void Model<NROWS,NCOLS>::Step(real_t tstart, real_t tend, real_t dt)
 
     /* Store concentration */
     if (write_each_iter) {
-      WriteConcToFile();
+      WriteConcFile();
     }
   }
 

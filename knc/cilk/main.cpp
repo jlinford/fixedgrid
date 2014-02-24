@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 
   /* Store initial concentration */
   cout << "Writing initial concentration...";
-  m.WriteConcToFile();
+  m.WriteConcFile();
   cout << " done." << endl;
 
   /* Iterate */
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 
   /* Store final concentration */
   cout << "Writing final concentration...";
-  m.WriteConcToFile();
+  m.WriteConcFile();
   cout << " done." << endl;
 
   /* Show metrics */
