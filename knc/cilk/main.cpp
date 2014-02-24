@@ -20,8 +20,11 @@ using namespace fixedgrid;
 static int const runID = 1;
 
 /* Matrix dimensions */
-#define NROWS 600
-#define NCOLS 600
+//#define NROWS 600
+//#define NCOLS 600
+
+static real_t const nrows = 600;
+static real_t const ncols = 600;
 
 /* Cell dimensions */
 static real_t const dx = 1000;
@@ -45,9 +48,6 @@ static real_t const wind_v_init = -5.0;
 /* Initial diffusion (m^2/s) */
 static real_t const diff_init = 100.0;
 
-// Instantiate the template class
-typedef class Model<NROWS, NCOLS> model_t;
-
 
 /**
  * Program entry point.
@@ -57,6 +57,18 @@ int main(int argc, char** argv)
   /* Wall clock timer is always used */
   Timer wall_clock;
   wall_clock.start();
+
+//  // Get grid dimensions
+//  if (argc < 3) {
+//	  cout << "Usage:" << argv[0] << " nrows ncols" << endl;
+//	  exit(1);
+//  }
+//  size_t const nrows = atoi(argv[1]);
+//  size_t const ncols = atoi(argv[2]);
+
+  // Instantiate the template class
+  typedef class Model<nrows, ncols> model_t;
+
 
   /* Initialize model */
   model_t m(runID, dx, dy, dz,
@@ -77,8 +89,8 @@ int main(int argc, char** argv)
 #endif
        << "\n"
        << "SPACE DOMAIN:\n"
-       << "    LENGTH (X): " << NCOLS*dx << " meters\n"
-       << "    WIDTH  (Y): " << NROWS*dy << " meters\n"
+       << "    LENGTH (X): " << nrows*dx << " meters\n"
+       << "    WIDTH  (Y): " << ncols*dy << " meters\n"
        << "    DEPTH  (Z): " << dz << " meters\n"
        << "\n"
        << "TIME SPAN:\n"

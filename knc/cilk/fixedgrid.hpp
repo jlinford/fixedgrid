@@ -67,14 +67,13 @@ private:
 
   matrix_t alloc(void) {
     void * memptr;
-    std::cout << NROWS << ", " << NCOLS << std::endl;
     switch (posix_memalign(&memptr, 64, NROWS*NCOLS*sizeof(real_t))) {
       case EINVAL:
-        std::cerr << "ERROR: Invalid argument to posix_memalign" << endl;
+        std::cerr << "ERROR: Invalid argument to posix_memalign" << std::endl;
         memptr = NULL;
         break;
       case ENOMEM:
-        std::cerr << "ERROR: Insufficient memory for allocation" << endl;
+        std::cerr << "ERROR: Insufficient memory for allocation" << std::endl;
         memptr = NULL;
         break;
     }
@@ -163,22 +162,25 @@ static inline real_t advec_diff(
 template < size_t N >
 static inline void space_advec_diff(
     real_t const cell_size,
-    real_t const c[N], real_t const w[N], real_t const d[N],
-    real_t const cb[4], real_t const wb[4], real_t const db[4], 
-    real_t dcdx[N])
+	real_t const cb0, real_t const wb0, real_t const db0,
+	real_t const cb1, real_t const wb1, real_t const db1,
+	real_t const cb2, real_t const wb2, real_t const db2,
+	real_t const cb3, real_t const wb3, real_t const db3,
+	real_t const c[N], real_t const w[N], real_t const d[N],
+	real_t dcdx[N])
 {
   /* Do boundary cell c[0] explicitly */
   dcdx[0] = advec_diff(cell_size,
-      cb[0], wb[0], db[0],  /* 2-left neighbors */
-      cb[1], wb[1], db[1],  /* 1-left neighbors */
+      cb0, wb0, db0,  /* 2-left neighbors */
+      cb1, wb1, db1,  /* 1-left neighbors */
       c[0], w[0], d[0],     /* Values */
       c[1], w[1], d[1],     /* 1-right neighbors */
       c[2], w[2], d[2]);    /* 2-right neighbors */
 
   /* Do boundary cell c[1] explicitly */
   dcdx[1] = advec_diff(cell_size,
-      cb[1], wb[1], db[1],  /* 2-left neighbors */
-      cb[2], wb[2], db[2],  /* 1-left neighbors */
+      cb1, wb1, db1,  /* 2-left neighbors */
+      cb2, wb2, db2,  /* 1-left neighbors */
       c[1], w[1], d[1],     /* Values */
       c[2], w[2], d[2],     /* 1-right neighbors */
       c[3], w[3], d[3]);    /* 2-right neighbors */
@@ -197,27 +199,26 @@ static inline void space_advec_diff(
       c[N-4], w[N-4], d[N-4],  /* 2-left neighbors */
       c[N-3], w[N-3], d[N-3],  /* 1-left neighbors */
       c[N-2], w[N-2], d[N-2],  /* Values */
-      cb[1],  wb[1],  db[1],   /* 1-right neighbors */
-      cb[2],  wb[2],  db[2]);  /* 2-right neighbors */
+      cb1,  wb1,  db1,   /* 1-right neighbors */
+      cb2,  wb2,  db2);  /* 2-right neighbors */
 
   /* Do boundary cell c[n-1] explicitly */
   dcdx[N-1] = advec_diff(cell_size,
       c[N-3], w[N-3], d[N-3],  /* 2-left neighbors */
       c[N-2], w[N-2], d[N-2],  /* 1-left neighbors */
       c[N-1], w[N-1], d[N-1],  /* Values */
-      cb[2],  wb[2],  db[2],   /* 1-right neighbors */
-      cb[3],  wb[3],  db[3]);  /* 2-right neighbors */
+      cb2,  wb2,  db2,   /* 1-right neighbors */
+      cb3,  wb3,  db3);  /* 2-right neighbors */
 }
 
 template < size_t N >
 static inline void discretize(
     real_t const cell_size, real_t const dt,
-    real_t const conc_in[N],
-    real_t const wind[N],
-    real_t const diff[N],
-    real_t const concbound[4],
-    real_t const windbound[4],
-    real_t const diffbound[4],
+	real_t const cb0, real_t const wb0, real_t const db0,
+	real_t const cb1, real_t const wb1, real_t const db1,
+	real_t const cb2, real_t const wb2, real_t const db2,
+	real_t const cb3, real_t const wb3, real_t const db3,
+    real_t const conc_in[N], real_t const wind[N], real_t const diff[N],
     real_t conc_out[N])
 {
   real_t c[N];
@@ -226,10 +227,22 @@ static inline void discretize(
   conc_out[:] = conc_in[:];
   c[:] = conc_in[:];
 
-  space_advec_diff<N>(cell_size, conc_in, wind, diff, concbound, windbound, diffbound, dcdx);
+  space_advec_diff<N>(
+		  cell_size,
+		  cb0, wb0, db0,
+		  cb1, wb1, db1,
+		  cb2, wb2, db2,
+		  cb3, wb3, db3,
+		  conc_in, wind, diff, dcdx);
   c[:] += dt * dcdx[:];
 
-  space_advec_diff<N>(cell_size, c, wind, diff, concbound, windbound, diffbound, dcdx);
+  space_advec_diff<N>(
+		  cell_size,
+		  cb0, wb0, db0,
+		  cb1, wb1, db1,
+		  cb2, wb2, db2,
+		  cb3, wb3, db3,
+		  c, wind, diff, dcdx);
   c[:] += dt * dcdx[:];
 
   conc_out[:] = 0.5 * (conc_out[:] + c[:]);
@@ -298,29 +311,28 @@ void Model<NROWS,NCOLS>::discretize_rows(real_t dt)
       /* Buffers */
       real_t buff[NCOLS];
 
-      /* Boundary values */
-      real_t cbound[4];
-      real_t wbound[4];
-      real_t dbound[4];
-
       #pragma omp for
       for (int i = 0; i < NROWS; i++) {
-        TIMER_START("Buffering");
-        cbound[0] = conc[i][NCOLS - 2];
-        cbound[1] = conc[i][NCOLS - 1];
-        cbound[2] = conc[i][0];
-        cbound[3] = conc[i][1];
-        wbound[0] = wind_u[i][NCOLS - 2];
-        wbound[1] = wind_u[i][NCOLS - 1];
-        wbound[2] = wind_u[i][0];
-        wbound[3] = wind_u[i][1];
-        dbound[0] = diff[i][NCOLS - 2];
-        dbound[1] = diff[i][NCOLS - 1];
-        dbound[2] = diff[i][0];
-        dbound[3] = diff[i][1];
-        TIMER_STOP("Buffering");
+        real_t cb0 = conc[i][NCOLS - 2];
+        real_t cb1 = conc[i][NCOLS - 1];
+        real_t cb2 = conc[i][0];
+        real_t cb3 = conc[i][1];
+        real_t wb0 = wind_u[i][NCOLS - 2];
+        real_t wb1 = wind_u[i][NCOLS - 1];
+        real_t wb2 = wind_u[i][0];
+        real_t wb3 = wind_u[i][1];
+        real_t db0 = diff[i][NCOLS - 2];
+        real_t db1 = diff[i][NCOLS - 1];
+        real_t db2 = diff[i][0];
+        real_t db3 = diff[i][1];
 
-        discretize<NCOLS>(dx, 0.5*dt, conc[i], wind_u[i], diff[i], cbound, wbound, dbound, buff);
+        discretize<NCOLS>(dx, 0.5*dt,
+        		cb0, wb0, db0,
+        		cb1, wb1, db1,
+        		cb2, wb2, db2,
+        		cb3, wb3, db3,
+        		conc[i], wind_u[i], diff[i],
+        		buff);
 
         conc[i][:] = buff[:];
       }
@@ -354,27 +366,30 @@ void Model<NROWS,NCOLS>::discretize_cols(real_t dt)
 
       #pragma omp for
       for (int j = 0; j < NCOLS; j++) {
-        TIMER_START("Buffering");
-
         ccol[:] = conc[0:NROWS][j];
         wcol[:] = wind_v[0:NROWS][j];
         dcol[:] = diff[0:NROWS][j];
 
-        cbound[0] = ccol[NROWS - 2];
-        cbound[1] = ccol[NROWS - 1];
-        cbound[2] = ccol[0];
-        cbound[3] = ccol[1];
-        wbound[0] = wcol[NROWS - 2];
-        wbound[1] = wcol[NROWS - 1];
-        wbound[2] = wcol[0];
-        wbound[3] = wcol[1];
-        dbound[0] = dcol[NROWS - 2];
-        dbound[1] = dcol[NROWS - 1];
-        dbound[2] = dcol[0];
-        dbound[3] = dcol[1];
-        TIMER_STOP("Buffering");
+        real_t cb0 = conc[NROWS - 2][j];
+        real_t cb1 = conc[NROWS - 1][j];
+        real_t cb2 = conc[0][j];
+        real_t cb3 = conc[1][j];
+        real_t wb0 = wind_v[NROWS - 2][j];
+        real_t wb1 = wind_v[NROWS - 1][j];
+        real_t wb2 = wind_v[0][j];
+        real_t wb3 = wind_v[1][j];
+        real_t db0 = diff[NROWS - 2][j];
+        real_t db1 = diff[NROWS - 1][j];
+        real_t db2 = diff[0][j];
+        real_t db3 = diff[1][j];
 
-        discretize<NROWS>(dy, dt, ccol, wcol, dcol, cbound, wbound, dbound, buff);
+        discretize<NROWS>(dy, dt,
+        		cb0, wb0, db0,
+        		cb1, wb1, db1,
+        		cb2, wb2, db2,
+        		cb3, wb3, db3,
+        		ccol, wcol, dcol,
+        		buff);
 
         conc[0:NROWS][j] = buff[:];
 
