@@ -207,7 +207,6 @@ void Model::discretize_rows(real_t dt)
 
     #pragma omp parallel for private(buff, cbound, wbound, dbound) default(shared)
     for (int i = 0; i < nrows; i++) {
-      TIMER_START("Buffering");
       cbound[0] = conc(i, ncols - 2);
       cbound[1] = conc(i, ncols - 1);
       cbound[2] = conc(i, 0);
@@ -220,7 +219,6 @@ void Model::discretize_rows(real_t dt)
       dbound[1] = diff(i, ncols - 1);
       dbound[2] = diff(i, 0);
       dbound[3] = diff(i, 1);
-      TIMER_STOP("Buffering");
 
       discretize(ncols, dx, 0.5 * dt, conc(i), wind_u(i), diff(i), cbound, wbound, dbound, buff);
 
@@ -253,7 +251,6 @@ void Model::discretize_cols(real_t dt)
 
     #pragma omp parallel for private(ccol, wcol, dcol, buff, cbound, wbound, dbound) default(shared)
     for (int j = 0; j < ncols; j++) {
-      TIMER_START("Buffering");
       for (int i = 0; i < nrows; i++) {
         ccol[i] = conc(i, j);
         wcol[i] = wind_v(i, j);
@@ -272,7 +269,6 @@ void Model::discretize_cols(real_t dt)
       dbound[1] = dcol[nrows - 1];
       dbound[2] = dcol[0];
       dbound[3] = dcol[1];
-      TIMER_STOP("Buffering");
 
       discretize(nrows, dy, dt, ccol, wcol, dcol, cbound, wbound, dbound, buff);
 
