@@ -1,6 +1,7 @@
 .project
 .cproject
 .settings
+.ptp*
 *.o
 *.mod
 *.so
