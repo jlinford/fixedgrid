@@ -16,11 +16,11 @@ else
   MIC_LDFLAGS = -mmic
 endif
 
-REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report2
+REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report6
 OPT_CXXFLAGS = -O3 -g -openmp
 
 LD = $(CXX)
-REPORT_LDFLAGS = -opt-report-phase=offload -vec-report2
+REPORT_LDFLAGS = -opt-report-phase=offload -vec-report6
 OPT_LDFLAGS = -O3 -g -openmp
 
 LIBS = -lm
@@ -39,6 +39,7 @@ EXE = fixedgrid
 SRC = $(wildcard *.cpp)
 HDR = $(wildcard *.hpp)
 OBJ = $(SRC:.cpp=.o)
+MAKEFILE = Makefile
 
 .PHONY: all clean
 
@@ -47,7 +48,7 @@ all: $(EXE)
 $(EXE): $(OBJ)
 	$(LD) $(LDFLAGS) $(OBJ) -o $(EXE) $(LIBS)
 
-%.o: %.cpp $(HDR)
+%.o: %.cpp $(HDR) $(MAKEFILE)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 clean: 

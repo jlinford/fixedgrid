@@ -20,11 +20,8 @@ using namespace fixedgrid;
 static int const runID = 1;
 
 /* Matrix dimensions */
-//#define NROWS 600
-//#define NCOLS 600
-
-static real_t const nrows = 600;
-static real_t const ncols = 600;
+static real_t const nrows = 6000;
+static real_t const ncols = 1000;
 
 /* Cell dimensions */
 static real_t const dx = 1000;
@@ -33,7 +30,7 @@ static real_t const dz = 1000;
 
 /* Timespan */
 static real_t const tstart = 0*HOURS + 0*MINUTES + 0*SECONDS;
-static real_t const tend = 12*HOURS + 0*MINUTES + 0*SECONDS;
+static real_t const tend = 1*HOURS + 0*MINUTES + 0*SECONDS;
 
 /* Timestep size (sec) */
 static real_t const dt = 50;
@@ -58,14 +55,6 @@ int main(int argc, char** argv)
   Timer wall_clock;
   wall_clock.start();
 
-//  // Get grid dimensions
-//  if (argc < 3) {
-//	  cout << "Usage:" << argv[0] << " nrows ncols" << endl;
-//	  exit(1);
-//  }
-//  size_t const nrows = atoi(argv[1]);
-//  size_t const ncols = atoi(argv[2]);
-
   // Instantiate the template class
   typedef class Model<nrows, ncols> model_t;
 
@@ -75,7 +64,7 @@ int main(int argc, char** argv)
       conc_init, wind_u_init, wind_v_init, diff_init);
 
   /* Add O3 plume */
-  m.AddPlume(4.67E+23, 300, 300);
+  m.AddPlume(4.67E+23, nrows/2, ncols/2);
 
   /* Print startup banner */
   double tspan = tend - tstart;
@@ -92,6 +81,11 @@ int main(int argc, char** argv)
        << "    LENGTH (X): " << nrows*dx << " meters\n"
        << "    WIDTH  (Y): " << ncols*dy << " meters\n"
        << "    DEPTH  (Z): " << dz << " meters\n"
+       << "\n"
+       << "MATRIX DIMENSIONS:\n"
+       << "    ROWS        : " << m.NROWS << "\n"
+       << "    COLS        : " << m.NCOLS << "\n"
+       << "    COLS ALIGNED: " << m.NCOLS_ALIGNED << "\n"
        << "\n"
        << "TIME SPAN:\n"
        << "    " << tspan << " seconds \n"

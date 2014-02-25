@@ -19,7 +19,7 @@
 #if TIMERS_ENABLED
 #define TIMER_START(X) __global_metrics[X].start()
 #define TIMER_STOP(X) __global_metrics[X].stop()
-#define PRINT_METRICS() { cout << __global_metrics << endl; }
+#define PRINT_METRICS() { std::cout << __global_metrics << std::endl; }
 #else
 #define TIMER_START(X)
 #define TIMER_STOP(X)
@@ -77,5 +77,6 @@ private:
 };
 
 extern Metrics __global_metrics;
+#pragma omp threadprivate(__global_metrics)
 
 #endif

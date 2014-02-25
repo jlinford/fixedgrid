@@ -20,24 +20,25 @@ namespace fixedgrid {
 typedef float real_t;
 
 /* Model state variables */
-template < size_t NROWS, size_t NCOLS >
+template < size_t N, size_t M >
 class Model
 {
+
 public:
 
-  typedef real_t (*matrix_t)[NCOLS];
+  enum { NROWS=N, NCOLS=M, NCOLS_ALIGNED=((NCOLS + 63) & ~63UL) };
+
+  typedef real_t (*matrix_t)[NCOLS_ALIGNED];
 
   Model(int _run_id, size_t _dx, size_t _dy, size_t _dz,
       real_t conc_init, real_t wind_u_init, real_t wind_v_init, real_t diff_init) :
       write_each_iter(false), row_discret(true), col_discret(true),
       run_id(_run_id), dx(_dx), dy(_dy), dz(_dz), step(0), time(0),
-      conc(alloc()), wind_u(alloc()), wind_v(alloc()), diff(alloc())
-  { 
-    conc[0:NROWS][:] = conc_init;
-    wind_u[0:NROWS][:] = wind_u_init;
-    wind_v[0:NROWS][:] = wind_v_init;
-    diff[0:NROWS][:] = diff_init;
-  }
+      conc(init_matrix(conc_init)),
+      wind_u(init_matrix(wind_u_init)),
+      wind_v(init_matrix(wind_v_init)),
+      diff(init_matrix(diff_init))
+  { }
 
   ~Model()
   { }
@@ -65,28 +66,31 @@ public:
 
 private:
 
-  matrix_t alloc(void) {
+  matrix_t init_matrix(real_t const init) {
     void * memptr;
-    switch (posix_memalign(&memptr, 64, NROWS*NCOLS*sizeof(real_t))) {
+    switch (posix_memalign(&memptr, 64, NROWS*NCOLS_ALIGNED*sizeof(real_t))) {
       case EINVAL:
         std::cerr << "ERROR: Invalid argument to posix_memalign" << std::endl;
-        memptr = NULL;
-        break;
+        return NULL;
       case ENOMEM:
         std::cerr << "ERROR: Insufficient memory for allocation" << std::endl;
-        memptr = NULL;
-        break;
+        return NULL;
     }
+
+    real_t * __restrict__ p = (real_t*)memptr;
+    __assume_aligned(p, 64);
+    p[0:NROWS*NCOLS_ALIGNED] = init;
+
     return (matrix_t)memptr;
   }
 
   int WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname);
 
   /* Discretize rows a half timestep */
-  void discretize_rows(real_t dt);
+  void discretize_rows();
 
   /* Discretize cols a whole timestep */
-  void discretize_cols(real_t dt);
+  void discretize_cols();
 
   /* Write output each iteration? */
   bool write_each_iter;
@@ -109,6 +113,9 @@ private:
   /* Current model time */
   real_t time;
 
+  /* Time step size */
+  real_t dt;
+
   /* Concentration field [NROWS][NCOLS] */
   matrix_t conc;
 
@@ -120,19 +127,21 @@ private:
   matrix_t diff;
 };
 
+
 /*
  * Upwinded advection/diffusion stencil.
  * c = conc, w = wind, d = diff
  * x2l is the 2-left neighbor of x, etc.
  * x2r is the 2-right neighbor of x, etc.
  */
-static inline real_t advec_diff(
-		real_t const cell_size,
-		real_t const c2l, real_t const w2l, real_t const d2l,
-		real_t const c1l, real_t const w1l, real_t const d1l,
-		real_t const   c, real_t const   w, real_t const   d,
-		real_t const c1r, real_t const w1r, real_t const d1r,
-		real_t const c2r, real_t const w2r, real_t const d2r)
+static inline __declspec(vector)
+real_t advec_diff(
+    real_t const cell_size,
+    real_t const c2l, real_t const w2l, real_t const d2l,
+    real_t const c1l, real_t const w1l, real_t const d1l,
+    real_t const   c, real_t const   w, real_t const   d,
+    real_t const c1r, real_t const w1r, real_t const d1r,
+    real_t const c2r, real_t const w2r, real_t const d2r)
 {
   real_t windL = (w1l + w) / 2.0;
   real_t advec_termL;
@@ -158,19 +167,27 @@ static inline real_t advec_diff(
   return advec_term + diff_term;
 }
 
+
 /*
  * Applies advection / diffusion stencil
  */
-template < size_t N >
 static inline void space_advec_diff(
-    real_t const cell_size,
-	real_t const cb0, real_t const wb0, real_t const db0,
-	real_t const cb1, real_t const wb1, real_t const db1,
-	real_t const cb2, real_t const wb2, real_t const db2,
-	real_t const cb3, real_t const wb3, real_t const db3,
-	real_t const c[N], real_t const w[N], real_t const d[N],
-	real_t dcdx[N])
+    size_t const N, real_t const cell_size,
+    real_t const cb0, real_t const wb0, real_t const db0,
+    real_t const cb1, real_t const wb1, real_t const db1,
+    real_t const cb2, real_t const wb2, real_t const db2,
+    real_t const cb3, real_t const wb3, real_t const db3,
+    real_t const * __restrict__ c,
+    real_t const * __restrict__ w,
+    real_t const * __restrict__ d,
+    real_t * __restrict__ dcdx)
 {
+  __assume_aligned(c, 64);
+  __assume_aligned(w, 64);
+  __assume_aligned(d, 64);
+  __assume_aligned(dcdx, 64);
+  __assume(N%16==0);
+
   /* Do boundary cell c[0] explicitly */
   dcdx[0] = advec_diff(cell_size,
       cb0, wb0, db0,  /* 2-left neighbors */
@@ -213,41 +230,118 @@ static inline void space_advec_diff(
       cb3,  wb3,  db3);  /* 2-right neighbors */
 }
 
-template < size_t N >
+
 static inline void discretize(
-    real_t const cell_size, real_t const dt,
-	real_t const cb0, real_t const wb0, real_t const db0,
-	real_t const cb1, real_t const wb1, real_t const db1,
-	real_t const cb2, real_t const wb2, real_t const db2,
-	real_t const cb3, real_t const wb3, real_t const db3,
-    real_t const conc_in[N], real_t const wind[N], real_t const diff[N],
-    real_t conc_out[N])
+    size_t const N, real_t const cell_size, real_t const dt,
+    real_t const * __restrict__ c,
+    real_t const * __restrict__ w,
+    real_t const * __restrict__ d,
+    real_t * __restrict co)
 {
-  real_t c[N];
-  real_t dcdx[N];
+  __assume_aligned(c, 64);
+  __assume_aligned(w, 64);
+  __assume_aligned(d, 64);
+  __assume_aligned(co, 64);
+  __assume(N%16==0);
 
-  conc_out[:] = conc_in[:];
-  c[:] = conc_in[:];
+  real_t buff[N] __attribute__((aligned(64)));
+  real_t dcdx[N] __attribute__((aligned(64)));
 
-  space_advec_diff<N>(
-		  cell_size,
-		  cb0, wb0, db0,
-		  cb1, wb1, db1,
-		  cb2, wb2, db2,
-		  cb3, wb3, db3,
-		  conc_in, wind, diff, dcdx);
-  c[:] += dt * dcdx[:];
+  real_t const cb0 = c[N-2];
+  real_t const cb1 = c[N-1];
+  real_t const cb2 = c[0];
+  real_t const cb3 = c[1];
+  real_t const wb0 = w[N-2];
+  real_t const wb1 = w[N-1];
+  real_t const wb2 = w[0];
+  real_t const wb3 = w[1];
+  real_t const db0 = d[N-2];
+  real_t const db1 = d[N-1];
+  real_t const db2 = d[0];
+  real_t const db3 = d[1];
 
-  space_advec_diff<N>(
-		  cell_size,
-		  cb0, wb0, db0,
-		  cb1, wb1, db1,
-		  cb2, wb2, db2,
-		  cb3, wb3, db3,
-		  c, wind, diff, dcdx);
-  c[:] += dt * dcdx[:];
+  co[0:N] = c[0:N];
+  buff[0:N] = c[0:N];
 
-  conc_out[:] = 0.5 * (conc_out[:] + c[:]);
+  space_advec_diff(
+      N, cell_size,
+      cb0, wb0, db0,
+      cb1, wb1, db1,
+      cb2, wb2, db2,
+      cb3, wb3, db3,
+      c, w, d, dcdx);
+  buff[0:N] += dt * dcdx[0:N];
+
+  space_advec_diff(
+      N, cell_size,
+      cb0, wb0, db0,
+      cb1, wb1, db1,
+      cb2, wb2, db2,
+      cb3, wb3, db3,
+      buff, w, d, dcdx);
+  buff[0:N] += dt * dcdx[0:N];
+
+  co[0:N] = 0.5 * (co[0:N] + buff[0:N]);
+}
+
+
+/**
+ * Discretize rows 1/2 timestep
+ */
+template < size_t N, size_t M >
+void Model<N,M>::discretize_rows()
+{
+  if (row_discret) {
+    TIMER_START("Row Discret");
+
+    /* Buffers */
+    real_t buff[NCOLS_ALIGNED] __attribute__((aligned(64)));
+
+    #pragma omp for private(buff)
+    for (int i = 0; i < NROWS; i++) {
+      real_t * __restrict__ c = conc[i];
+      real_t const * __restrict__ w = wind_u[i];
+      real_t const * __restrict__ d = diff[i];
+
+      __assume_aligned(c, 64);
+      __assume_aligned(w, 64);
+      __assume_aligned(d, 64);
+
+      discretize(NCOLS_ALIGNED, dx, 0.5*dt, c, w, d, buff);
+      c[0:NCOLS_ALIGNED] = buff[:];
+    }
+
+    TIMER_STOP("Row Discret");
+  }
+}
+
+/**
+ * Discretize colums 1 timestep
+ */
+template < size_t N, size_t M >
+void Model<N,M>::discretize_cols()
+{
+  if (col_discret) {
+    TIMER_START("Col Discret");
+
+    /* Buffers */
+    real_t ccol[NROWS] __attribute__((aligned(64)));
+    real_t wcol[NROWS] __attribute__((aligned(64)));
+    real_t dcol[NROWS] __attribute__((aligned(64)));
+    real_t buff[NROWS] __attribute__((aligned(64)));
+
+    #pragma omp for private(ccol, wcol, dcol, buff)
+    for (int j = 0; j < NCOLS; j++) {
+      ccol[:] = conc[0:NROWS][j];
+      wcol[:] = wind_v[0:NROWS][j];
+      dcol[:] = diff[0:NROWS][j];
+
+      discretize(NCOLS, dy, dt, ccol, wcol, dcol, buff);
+      conc[0:NROWS][j] = buff[:];
+    }
+
+    TIMER_STOP("Col Discret");
+  }
 }
 
 /*
@@ -281,8 +375,8 @@ static inline void discretize(
   * These triplets are then converted into gnuplot iso-curves and then gnuplot
   * proceeds in the usual manner to do the rest of the plotting.
   */
-template < size_t NROWS, size_t NCOLS >
-int Model<NROWS,NCOLS>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname) 
+template < size_t N, size_t M >
+int Model<N,M>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname)
 {
   using namespace std;
 
@@ -310,7 +404,7 @@ int Model<NROWS,NCOLS>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * 
   // Write matrix rows
   for (int i=0; i<NROWS; ++i) {
     buffer[0] = (float)i;
-    buffer[1:NCOLS] = mat[i][:];
+    buffer[1:NCOLS] = mat[i][0:NCOLS];
     if (fwrite(buffer, sizeof(float), nmemb, fout) != nmemb) {
       fprintf(stderr, "ERROR: Failed to write %ld elements to '%s'\n", nmemb, fname);
       return -1;
@@ -322,8 +416,8 @@ int Model<NROWS,NCOLS>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * 
   return 0;
 }
 
-template < size_t NROWS, size_t NCOLS >
-void Model<NROWS,NCOLS>::WriteConcFile(void)
+template < size_t N, size_t M >
+void Model<N,M>::WriteConcFile(void)
 {
   TIMER_START("File I/O");
 
@@ -331,22 +425,35 @@ void Model<NROWS,NCOLS>::WriteConcFile(void)
   char fname[512];
   sprintf(fname, "fixedgrid_%03d_%05ld.dat", run_id, step);
 
-  WriteGnuplotBinaryMatrixFile(conc, fname);
+  if (WriteGnuplotBinaryMatrixFile(conc, fname)) {
+    std::cerr << "ERROR: Failed to write '" << fname << "'" << std::endl;
+  } else {
+    std::cout << "Wrote '" << fname << "'" << std::endl;
+  }
 
   TIMER_STOP("File I/O");
 }
 
-template < size_t NROWS, size_t NCOLS >
-void Model<NROWS,NCOLS>::Step(real_t tstart, real_t tend, real_t dt)
+template < size_t N, size_t M >
+void Model<N,M>::Step(real_t tstart, real_t tend, real_t dt)
 {
   TIMER_START("Step");
 
+  this->dt = dt;
   for(time=tstart; time < tend; time += dt) {
-    //cout << "  Step " << step << ": Time = " << time << endl;
 
-    discretize_rows(dt);
-    discretize_cols(dt);
-    discretize_rows(dt);
+    #pragma omp parallel
+    {
+      discretize_rows();
+      discretize_cols();
+      discretize_rows();
+    }
+
+    // Show progress
+    std::cout << "  Step " << step << ": Time = " << time << std::endl;
+    if ((step % 10) == 0) {
+      PRINT_METRICS();
+    }
 
     ++step;
 
@@ -371,108 +478,6 @@ void Model<NROWS,NCOLS>::Step(real_t tstart, real_t tend, real_t dt)
   TIMER_STOP("Step");
 }
 
-/**
- * Discretize rows 1/2 timestep
- */
-template < size_t NROWS, size_t NCOLS >
-void Model<NROWS,NCOLS>::discretize_rows(real_t dt)
-{
-  if (row_discret) {
-    TIMER_START("Row Discret");
-
-    #pragma omp parallel
-    {
-      /* Buffers */
-      real_t buff[NCOLS];
-
-      #pragma omp for
-      for (int i = 0; i < NROWS; i++) {
-        real_t cb0 = conc[i][NCOLS - 2];
-        real_t cb1 = conc[i][NCOLS - 1];
-        real_t cb2 = conc[i][0];
-        real_t cb3 = conc[i][1];
-        real_t wb0 = wind_u[i][NCOLS - 2];
-        real_t wb1 = wind_u[i][NCOLS - 1];
-        real_t wb2 = wind_u[i][0];
-        real_t wb3 = wind_u[i][1];
-        real_t db0 = diff[i][NCOLS - 2];
-        real_t db1 = diff[i][NCOLS - 1];
-        real_t db2 = diff[i][0];
-        real_t db3 = diff[i][1];
-
-        discretize<NCOLS>(dx, 0.5*dt,
-        		cb0, wb0, db0,
-        		cb1, wb1, db1,
-        		cb2, wb2, db2,
-        		cb3, wb3, db3,
-        		conc[i], wind_u[i], diff[i],
-        		buff);
-
-        conc[i][:] = buff[:];
-      }
-    } // pragma omp parallel
-
-    TIMER_STOP("Row Discret");
-  }
-}
-
-/**
- * Discretize colums 1 timestep
- */
-template < size_t NROWS, size_t NCOLS >
-void Model<NROWS,NCOLS>::discretize_cols(real_t dt)
-{
-  if (col_discret) {
-    TIMER_START("Col Discret");
-
-    #pragma omp parallel
-    {
-      /* Buffers */
-      real_t ccol[NROWS];
-      real_t wcol[NROWS];
-      real_t dcol[NROWS];
-      real_t buff[NROWS];
-
-      /* Boundary values */
-      real_t cbound[4];
-      real_t wbound[4];
-      real_t dbound[4];
-
-      #pragma omp for
-      for (int j = 0; j < NCOLS; j++) {
-        ccol[:] = conc[0:NROWS][j];
-        wcol[:] = wind_v[0:NROWS][j];
-        dcol[:] = diff[0:NROWS][j];
-
-        real_t cb0 = conc[NROWS - 2][j];
-        real_t cb1 = conc[NROWS - 1][j];
-        real_t cb2 = conc[0][j];
-        real_t cb3 = conc[1][j];
-        real_t wb0 = wind_v[NROWS - 2][j];
-        real_t wb1 = wind_v[NROWS - 1][j];
-        real_t wb2 = wind_v[0][j];
-        real_t wb3 = wind_v[1][j];
-        real_t db0 = diff[NROWS - 2][j];
-        real_t db1 = diff[NROWS - 1][j];
-        real_t db2 = diff[0][j];
-        real_t db3 = diff[1][j];
-
-        discretize<NROWS>(dy, dt,
-        		cb0, wb0, db0,
-        		cb1, wb1, db1,
-        		cb2, wb2, db2,
-        		cb3, wb3, db3,
-        		ccol, wcol, dcol,
-        		buff);
-
-        conc[0:NROWS][j] = buff[:];
-
-      }
-    } // pragma omp parallel
-
-    TIMER_STOP("Col Discret");
-  }
-}
 
 } // namespace fixedgrid
 
