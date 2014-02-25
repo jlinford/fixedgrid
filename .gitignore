@@ -13,3 +13,4 @@ profile.*
 *.dat
 fixedgrid
 fortran/OUT_*
+snr/snr
