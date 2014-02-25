@@ -20,8 +20,8 @@ using namespace fixedgrid;
 static int const runID = 1;
 
 /* Matrix dimensions */
-static size_t const nrows = 600;
-static size_t const ncols = 600;
+static size_t const nrows = 1024;
+static size_t const ncols = 1024;
 
 /* Cell dimensions */
 static real_t const dx = 1000;
@@ -30,7 +30,7 @@ static real_t const dz = 1000;
 
 /* Timespan */
 static real_t const tstart = 0*HOURS + 0*MINUTES + 0*SECONDS;
-static real_t const tend = 12*HOURS + 0*MINUTES + 0*SECONDS;
+static real_t const tend = 1*HOURS + 0*MINUTES + 0*SECONDS;
 
 /* Timestep size (sec) */
 static real_t const dt = 50;
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
       conc_init, wind_u_init, wind_v_init, diff_init);
 
   /* Add O3 plume */
-  m.AddPlume(4.67E+23, 300, 300);
+  m.AddPlume(4.67E+23, nrows/2, ncols/2);
 
   /* Print startup banner */
   double tspan = tend - tstart;

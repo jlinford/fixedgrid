@@ -160,7 +160,7 @@ void Model::Step(real_t tstart, real_t tend, real_t dt)
   TIMER_START("Step");
 
   for(time=tstart; time < tend; time += dt) {
-    //cout << "  Step " << step << ": Time = " << time << endl;
+    cout << "  Step " << step << ": Time = " << time << endl;
 
     discretize_rows(dt);
     discretize_cols(dt);
