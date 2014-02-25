@@ -20,13 +20,13 @@ namespace fixedgrid {
 typedef float real_t;
 
 /* Model state variables */
-template < size_t N, size_t M >
+template < size_t M, size_t N >
 class Model
 {
 
 public:
 
-  enum { NROWS=N, NCOLS=M, NCOLS_ALIGNED=((NCOLS + 63) & ~63UL) };
+  enum { NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + 63) & ~63UL) };
 
   typedef real_t (*matrix_t)[NCOLS_ALIGNED];
 
@@ -288,8 +288,8 @@ static inline void discretize(
 /**
  * Discretize rows 1/2 timestep
  */
-template < size_t N, size_t M >
-void Model<N,M>::discretize_rows()
+template < size_t M, size_t N >
+void Model<M,N>::discretize_rows()
 {
   if (row_discret) {
     TIMER_START("Row Discret");
@@ -318,8 +318,8 @@ void Model<N,M>::discretize_rows()
 /**
  * Discretize colums 1 timestep
  */
-template < size_t N, size_t M >
-void Model<N,M>::discretize_cols()
+template < size_t M, size_t N >
+void Model<M,N>::discretize_cols()
 {
   if (col_discret) {
     TIMER_START("Col Discret");
@@ -375,8 +375,8 @@ void Model<N,M>::discretize_cols()
   * These triplets are then converted into gnuplot iso-curves and then gnuplot
   * proceeds in the usual manner to do the rest of the plotting.
   */
-template < size_t N, size_t M >
-int Model<N,M>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname)
+template < size_t M, size_t N >
+int Model<M,N>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname)
 {
   using namespace std;
 
@@ -416,8 +416,8 @@ int Model<N,M>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname)
   return 0;
 }
 
-template < size_t N, size_t M >
-void Model<N,M>::WriteConcFile(void)
+template < size_t M, size_t N >
+void Model<M,N>::WriteConcFile(void)
 {
   TIMER_START("File I/O");
 
@@ -434,8 +434,8 @@ void Model<N,M>::WriteConcFile(void)
   TIMER_STOP("File I/O");
 }
 
-template < size_t N, size_t M >
-void Model<N,M>::Step(real_t tstart, real_t tend, real_t dt)
+template < size_t M, size_t N >
+void Model<M,N>::Step(real_t tstart, real_t tend, real_t dt)
 {
   TIMER_START("Step");
 
