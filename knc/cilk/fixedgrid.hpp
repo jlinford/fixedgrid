@@ -26,7 +26,7 @@ class Model
 
 public:
 
-  enum { NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + 63) & ~63UL) };
+  enum { NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + 15) & ~15UL) };
 
   typedef real_t (*matrix_t)[NCOLS_ALIGNED];
 
@@ -336,7 +336,7 @@ void Model<M,N>::discretize_cols()
       wcol[:] = wind_v[0:NROWS][j];
       dcol[:] = diff[0:NROWS][j];
 
-      discretize(NCOLS, dy, dt, ccol, wcol, dcol, buff);
+      discretize(NROWS, dy, dt, ccol, wcol, dcol, buff);
       conc[0:NROWS][j] = buff[:];
     }
 
@@ -442,7 +442,7 @@ void Model<M,N>::Step(real_t tstart, real_t tend, real_t dt)
   this->dt = dt;
   for(time=tstart; time < tend; time += dt) {
 
-    #pragma omp parallel
+    #pragma omp parallel default(shared)
     {
       discretize_rows();
       discretize_cols();
