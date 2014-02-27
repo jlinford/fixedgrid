@@ -33,11 +33,12 @@ public:
 
   enum { BLOCK=B, NROWS=M, NCOLS=N, NCOLS_ALIGNED=((N + (B-1)) & ~(B-1)) };
 
+  typedef Model<M,N,B> model_t;
   typedef real_t (*matrix_t)[NCOLS_ALIGNED];
+  typedef real_t const (*const_matrix_t)[NCOLS_ALIGNED];
 
   Model(int _run_id, size_t _dx, size_t _dy, size_t _dz,
       real_t conc_init, real_t wind_u_init, real_t wind_v_init, real_t diff_init) :
-      write_each_iter(false), row_discret(true), col_discret(true),
       run_id(_run_id), dx(_dx), dy(_dy), dz(_dz), step(0), time(0),
       conc(init_matrix(conc_init)),
       wind_u(init_matrix(wind_u_init)),
@@ -51,14 +52,6 @@ public:
   /* Add emission plume (mol/m^3) */
   void AddPlume(real_t plume, size_t row, size_t col) {
     conc[row][col] += plume / (dx * dy * dz);
-  }
-
-  bool AreRowsDiscretized() const {
-    return row_discret;
-  }
-
-  bool AreColsDiscretized() const {
-    return col_discret;
   }
 
   real_t GetTime() const {
@@ -89,21 +82,6 @@ private:
 
   int WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname);
 
-  /* Discretize rows a half timestep */
-  void discretize_rows();
-
-  /* Discretize cols a whole timestep */
-  void discretize_cols();
-
-  /* Write output each iteration? */
-  bool write_each_iter;
-
-  /* Discretize rows each iteration? */
-  bool row_discret;
-
-  /* Discretize columns each iteration? */
-  bool col_discret;
-
   /* Run identifier */
   int run_id;
 
@@ -115,9 +93,6 @@ private:
 
   /* Current model time */
   real_t time;
-
-  /* Time step size */
-  real_t dt;
 
   /* Concentration field [NROWS][NCOLS] */
   matrix_t conc;
@@ -137,7 +112,7 @@ private:
  * x2l is the 2-left neighbor of x, etc.
  * x2r is the 2-right neighbor of x, etc.
  */
-static inline __declspec(vector)
+static inline __declspec(target(mic)) __declspec(vector)
 real_t advec_diff(
     real_t const cell_size,
     real_t const c2l, real_t const w2l, real_t const d2l,
@@ -175,7 +150,8 @@ real_t advec_diff(
  * Applies advection / diffusion stencil
  */
 template < size_t N >
-static inline void space_advec_diff(real_t const cell_size,
+static inline __declspec(target(mic))
+void space_advec_diff(real_t const cell_size,
     real_t const c[N], real_t const w[N], real_t const d[N], real_t dcdx[N])
 {
   __assume_aligned(c, 64);
@@ -227,7 +203,8 @@ static inline void space_advec_diff(real_t const cell_size,
 
 
 template < size_t N, size_t CSTRIDE, size_t WSTRIDE, size_t DSTRIDE, size_t BLOCK >
-static inline void space_advec_diff(real_t const cell_size,
+static inline __declspec(target(mic))
+void space_advec_diff(real_t const cell_size,
     real_t const c[N][CSTRIDE],
     real_t const w[N][WSTRIDE],
     real_t const d[N][DSTRIDE],
@@ -284,113 +261,122 @@ static inline void space_advec_diff(real_t const cell_size,
 /**
  * Discretize rows 1/2 timestep
  */
-template < size_t M, size_t N, size_t B >
-void Model<M,N,B>::discretize_rows()
+template < typename MODEL, typename MATRIX >
+__declspec(target(mic))
+void discretize_rows(real_t dx, real_t dt, MATRIX conc, MATRIX wind, MATRIX diff)
 {
-  if (row_discret) {
-    TIMER_START("Row Discret");
+  // Import matrix dimensions from template
+  enum { NROWS = MODEL::NROWS, NCOLS = MODEL::NCOLS };
 
-    /* Buffers */
-    real_t b[NCOLS] __attribute__((aligned(64)));
-    real_t dcdx[NCOLS] __attribute__((aligned(64)));
+  TIMER_START("Row Discret");
 
-    #pragma omp for private(b, dcdx)
-    for (int i = 0; i < NROWS; i++) {
-      real_t const * __restrict__ c = conc[i];
-      real_t const * __restrict__ w = wind_u[i];
-      real_t const * __restrict__ d = diff[i];
+  /* Buffers */
+  real_t b[NCOLS] __attribute__((aligned(64)));
+  real_t dcdx[NCOLS] __attribute__((aligned(64)));
 
-      b[:] = c[0:NCOLS];
+  #pragma omp for private(b, dcdx)
+  for (int i = 0; i < NROWS; i++) {
+    real_t const * __restrict__ c = conc[i];
+    real_t const * __restrict__ w = wind[i];
+    real_t const * __restrict__ d = diff[i];
 
-      space_advec_diff<NCOLS>(dx, c, w, d, dcdx);
-      b[:] += 0.5*dt * dcdx[:];
+    b[:] = c[0:NCOLS];
 
-      space_advec_diff<NCOLS>(dx, b, w, d, dcdx);
-      b[:] += 0.5*dt * dcdx[:];
+    space_advec_diff<NCOLS>(dx, c, w, d, dcdx);
+    b[:] += dt * dcdx[:];
 
-      conc[i][0:NCOLS] = 0.5 * (conc[i][0:NCOLS] + b[:]);
-    }
+    space_advec_diff<NCOLS>(dx, b, w, d, dcdx);
+    b[:] += dt * dcdx[:];
 
-    TIMER_STOP("Row Discret");
+    conc[i][0:NCOLS] = 0.5 * (conc[i][0:NCOLS] + b[:]);
   }
+
+  TIMER_STOP("Row Discret");
 }
 
 /**
  * Discretize colums 1 timestep
  */
-template < size_t M, size_t N, size_t B >
-void Model<M,N,B>::discretize_cols()
+template < typename MODEL, typename MATRIX >
+__declspec(target(mic))
+void discretize_cols(real_t dy, real_t dt, MATRIX conc, MATRIX wind, MATRIX diff)
 {
-  if (col_discret) {
-    TIMER_START("Col Discret");
+  // Import matrix dimensions from template
+  enum {
+    BLOCK = MODEL::BLOCK,
+    NROWS = MODEL::NROWS,
+    NCOLS = MODEL::NCOLS,
+    NCOLS_ALIGNED = MODEL::NCOLS_ALIGNED
+  };
+
+  TIMER_START("Col Discret");
 
 #if USE_BLOCKED_DISCRETIZE
 
-    /* Buffers */
-    real_t b[NROWS][BLOCK] __attribute__((aligned(64)));
-    real_t dcdx[NROWS][BLOCK] __attribute__((aligned(64)));
+  /* Buffers */
+  real_t b[NROWS][BLOCK] __attribute__((aligned(64)));
+  real_t dcdx[NROWS][BLOCK] __attribute__((aligned(64)));
 
-    #pragma omp for private(b, dcdx)
-    for (int j=0; j < NCOLS; j+=BLOCK) {
-      b[:][:] = conc[0:NROWS][j:BLOCK];
+  #pragma omp for private(b, dcdx)
+  for (int j=0; j < NCOLS; j+=BLOCK) {
+    b[:][:] = conc[0:NROWS][j:BLOCK];
 
-      space_advec_diff<NROWS, NCOLS_ALIGNED, NCOLS_ALIGNED, NCOLS_ALIGNED, BLOCK>(dy,
-          (real_t (*)[NCOLS_ALIGNED])(conc[0] + j),
-          (real_t (*)[NCOLS_ALIGNED])(wind_v[0] + j),
-          (real_t (*)[NCOLS_ALIGNED])(diff[0] + j),
-          dcdx);
+    space_advec_diff<NROWS, NCOLS_ALIGNED, NCOLS_ALIGNED, NCOLS_ALIGNED, BLOCK>(dy,
+        (real_t (*)[NCOLS_ALIGNED])(conc[0] + j),
+        (real_t (*)[NCOLS_ALIGNED])(wind[0] + j),
+        (real_t (*)[NCOLS_ALIGNED])(diff[0] + j),
+        dcdx);
 
-      // COMPILER BUG: icpc (ICC) 14.0.1 20131008
-      // This line should be the same as the for-loop but it's not!
-      // b[:][:] += dt * dcdx[:][:];
-      for (int i=0; i<NROWS; ++i) {
-        b[i][:] += dt * dcdx[i][:];
-      }
-
-      space_advec_diff<NROWS, BLOCK, NCOLS_ALIGNED, NCOLS_ALIGNED, BLOCK>(dy,
-          b,
-          (real_t (*)[NCOLS_ALIGNED])(wind_v[0] + j),
-          (real_t (*)[NCOLS_ALIGNED])(diff[0] + j),
-          dcdx);
-
-      // COMPILER BUG: icpc (ICC) 14.0.1 20131008
-      // This line should be the same as the for-loop but it's not!
-      // b[:][:] += dt * dcdx[:][:];
-      for (int i=0; i<NROWS; ++i) {
-        b[i][:] += dt * dcdx[i][:];
-      }
-
-      conc[0:NROWS][j:BLOCK] = 0.5 * (conc[0:NROWS][j:BLOCK] + b[:][:]);
+    // COMPILER BUG: icpc (ICC) 14.0.1 20131008
+    // This line should be the same as the for-loop but it's not!
+    // b[:][:] += dt * dcdx[:][:];
+    for (int i=0; i<NROWS; ++i) {
+      b[i][:] += dt * dcdx[i][:];
     }
+
+    space_advec_diff<NROWS, BLOCK, NCOLS_ALIGNED, NCOLS_ALIGNED, BLOCK>(dy,
+        b,
+        (real_t (*)[NCOLS_ALIGNED])(wind[0] + j),
+        (real_t (*)[NCOLS_ALIGNED])(diff[0] + j),
+        dcdx);
+
+    // COMPILER BUG: icpc (ICC) 14.0.1 20131008
+    // This line should be the same as the for-loop but it's not!
+    // b[:][:] += dt * dcdx[:][:];
+    for (int i=0; i<NROWS; ++i) {
+      b[i][:] += dt * dcdx[i][:];
+    }
+
+    conc[0:NROWS][j:BLOCK] = 0.5 * (conc[0:NROWS][j:BLOCK] + b[:][:]);
+  }
 
 #else /* USE_BLOCKED_DISCRETIZE */
 
-    /* Buffers */
-    real_t b[NROWS] __attribute__((aligned(64)));
-    real_t c[NROWS] __attribute__((aligned(64)));
-    real_t w[NROWS] __attribute__((aligned(64)));
-    real_t d[NROWS] __attribute__((aligned(64)));
-    real_t dcdx[NROWS] __attribute__((aligned(64)));
+  /* Buffers */
+  real_t b[NROWS] __attribute__((aligned(64)));
+  real_t c[NROWS] __attribute__((aligned(64)));
+  real_t w[NROWS] __attribute__((aligned(64)));
+  real_t d[NROWS] __attribute__((aligned(64)));
+  real_t dcdx[NROWS] __attribute__((aligned(64)));
 
-    #pragma omp for private(b, c, w, d, dcdx)
-    for (int j = 0; j < NCOLS; j++) {
-      b[:] = c[:] = conc[0:NROWS][j];
-      w[:] = wind_v[0:NROWS][j];
-      d[:] = diff[0:NROWS][j];
+  #pragma omp for private(b, c, w, d, dcdx)
+  for (int j = 0; j < NCOLS; j++) {
+    b[:] = c[:] = conc[0:NROWS][j];
+    w[:] = wind[0:NROWS][j];
+    d[:] = diff[0:NROWS][j];
 
-      space_advec_diff<NROWS>(dy, c, w, d, dcdx);
-      b[:] += dt * dcdx[:];
+    space_advec_diff<NROWS>(dy, c, w, d, dcdx);
+    b[:] += dt * dcdx[:];
 
-      space_advec_diff<NROWS>(dy, b, w, d, dcdx);
-      b[:] += dt * dcdx[:];
+    space_advec_diff<NROWS>(dy, b, w, d, dcdx);
+    b[:] += dt * dcdx[:];
 
-      conc[0:NROWS][j] = 0.5 * (conc[0:NROWS][j] + b[:]);
-    }
+    conc[0:NROWS][j] = 0.5 * (conc[0:NROWS][j] + b[:]);
+  }
 
 #endif /* USE_BLOCKED_DISCRETIZE */
 
-    TIMER_STOP("Col Discret");
-  }
+  TIMER_STOP("Col Discret");
 }
 
 /*
@@ -488,41 +474,60 @@ void Model<M,N,B>::Step(real_t tstart, real_t tend, real_t dt)
 {
   TIMER_START("Step");
 
-  this->dt = dt;
-  for(time=tstart; time < tend; time += dt) {
+  // Prep data structures for offload
+  real_t time = this->time;
+  size_t dx = this->dx;
+  size_t dy = this->dy;
+  size_t step = this->step;
+  real_t * conc = (real_t*)this->conc;
+  real_t * wind_u = (real_t*)this->wind_u;
+  real_t * wind_v = (real_t*)this->wind_v;
+  real_t * diff = (real_t*)this->diff;
 
-    #pragma omp parallel default(shared)
-    {
-      discretize_rows();
-      discretize_cols();
-      discretize_rows();
-    }
+  #pragma offload target(mic) \
+          in(dx, dy, tstart, tend, dt) \
+          in(wind_u : length(NROWS*NCOLS_ALIGNED)) \
+          in(wind_v : length(NROWS*NCOLS_ALIGNED)) \
+          in(diff : length(NROWS*NCOLS_ALIGNED)) \
+          inout(time, step) \
+          inout(conc : length(NROWS*NCOLS_ALIGNED))
+  {
+    for(time=tstart; time < tend; time += dt) {
 
-    // Show progress
-    std::cout << "  Step " << step << ": Time = " << time << std::endl;
-    if ((step % 10) == 0) {
-      PRINT_METRICS();
-    }
+      #pragma omp parallel default(shared)
+      {
+        discretize_rows<model_t>(dx, 0.5*dt, (matrix_t)conc, (matrix_t)wind_u, (matrix_t)diff);
+        discretize_cols<model_t>(dy,     dt, (matrix_t)conc, (matrix_t)wind_v, (matrix_t)diff);
+        discretize_rows<model_t>(dx, 0.5*dt, (matrix_t)conc, (matrix_t)wind_u, (matrix_t)diff);
+      }
 
-    ++step;
+      // Show progress
+//      std::cout << "  Step " << step << ": Time = " << time << std::endl;
+//      if ((step % 10) == 0) {
+//        PRINT_METRICS();
+//      }
 
-    /*
-     * Could update wind field here...
-     */
+      ++step;
 
-    /*
-     * Could update diffusion tensor here...
-     */
+      /*
+       * Could update wind field here...
+       */
 
-    /*
-     * Could update environment here...
-     */
+      /*
+       * Could update diffusion tensor here...
+       */
 
-    /* Store concentration */
-    if (write_each_iter) {
-      WriteConcFile();
+      /*
+       * Could update environment here...
+       */
+
+      /* Store concentration */
+      // WriteConcFile();
     }
   }
+
+  this->time = time;
+  this->step = step;
 
   TIMER_STOP("Step");
 }

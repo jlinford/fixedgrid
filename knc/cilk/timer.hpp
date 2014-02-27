@@ -16,7 +16,7 @@
 #include <map>
 #include <sys/time.h>
 
-#if TIMERS_ENABLED
+#if TIMERS_ENABLED && ! __MIC__
 #define TIMER_START(X) __global_metrics[X].start()
 #define TIMER_STOP(X) __global_metrics[X].stop()
 #define PRINT_METRICS() { std::cout << __global_metrics << std::endl; }

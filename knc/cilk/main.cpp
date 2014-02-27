@@ -66,16 +66,34 @@ int main(int argc, char** argv)
   /* Add O3 plume */
   m.AddPlume(4.67E+23, nrows/2, ncols/2);
 
+  // Count threads
+  int host_procs, host_threads;
+  int dev_procs, dev_threads;
+#ifdef _OPENMP
+  host_procs = omp_get_num_procs();
+  host_threads = omp_get_max_threads();
+#else
+  host_procs = 1;
+  host_threads = 1;
+#endif
+#ifdef __INTEL_OFFLOAD
+  #pragma offload target(mic)
+  {
+    dev_procs = omp_get_num_procs();
+    dev_threads = omp_get_max_threads();
+  }
+#else
+  dev_procs = 0;
+  dev_threads = 0;
+#endif
+
   /* Print startup banner */
   double tspan = tend - tstart;
   cout << "\n"
        << "CONFIGURATION:\n"
-       << "    ROW DISCRETIZATION:    " << m.AreRowsDiscretized() << "\n"
-       << "    COLUMN DISCRETIZATION: " << m.AreColsDiscretized() << "\n"
-       << "    sizeof(real_t):        " << sizeof(real_t) << "\n"
-#ifdef _OPENMP
-       << "    OMP_NUM_THREADS:       " << omp_get_max_threads() << "\n"
-#endif
+       << "    sizeof(real_t): " << sizeof(real_t) << "\n"
+       << "    HOST THREADS  : " << host_threads << "/" << host_procs << "\n"
+       << "    DEVICE THREADS: " << dev_threads << "/" << dev_procs << "\n"
        << "\n"
        << "SPACE DOMAIN:\n"
        << "    LENGTH (X): " << nrows*dx << " meters\n"
