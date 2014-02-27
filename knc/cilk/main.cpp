@@ -17,11 +17,11 @@ using namespace std;
 using namespace fixedgrid;
 
 /* Run ID */
-static int const runID = 1;
+static int const runID = 100;
 
 /* Matrix dimensions */
-static size_t const nrows = 6000;
-static size_t const ncols = 1000;
+static size_t const nrows = 4000;
+static size_t const ncols = 3000;
 
 /* Cell dimensions */
 static real_t const dx = 1000;

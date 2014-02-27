@@ -20,8 +20,8 @@ using namespace fixedgrid;
 static int const runID = 1;
 
 /* Matrix dimensions */
-static size_t const nrows = 1024;
-static size_t const ncols = 1024;
+static size_t const nrows = 4000;
+static size_t const ncols = 3000;
 
 /* Cell dimensions */
 static real_t const dx = 1000;

@@ -16,11 +16,11 @@ else
   MIC_LDFLAGS = -mmic
 endif
 
-REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report2
+REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report6
 OPT_CXXFLAGS = -O3 -g -openmp
 
 LD = $(CXX)
-REPORT_LDFLAGS = -opt-report-phase=offload -vec-report2
+REPORT_LDFLAGS = -opt-report-phase=offload -vec-report6
 OPT_LDFLAGS = -O3 -g -openmp
 
 LIBS = -lm

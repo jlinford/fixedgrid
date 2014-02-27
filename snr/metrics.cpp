@@ -80,15 +80,20 @@ void Metrics::text_update(istream & in1, istream & in2)
   }
 }
 
-bool Metrics::binary_next(std::istream & in, int & t) 
+bool Metrics::binary_next(std::istream & in, double & t) 
 {
-  t = in.get();
+  //t = in.get();
+  //return in.good();
+  
+  float buff;
+  in.read((char*)&buff, sizeof(buff));
+  t = buff;
   return in.good();
 }
 
 void Metrics::binary_update(std::istream & in1, std::istream & in2) 
 {
-  int t1, t2;
+  double t1, t2;
   bool r1 = binary_next(in1, t1);
   bool r2 = binary_next(in2, t2);
   if (!(r1 && r2)) {

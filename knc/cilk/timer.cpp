@@ -13,7 +13,11 @@
 
 using namespace std;
 
-Metrics __global_metrics("Program");
+#ifdef __MIC__
+Metrics __global_metrics("Device");
+#else
+Metrics __global_metrics("Host");
+#endif
 
 double Timer::usec()
 {

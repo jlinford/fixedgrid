@@ -18,7 +18,7 @@ public:
   void update(std::istream & in1, std::istream & in2);
   void summary(void);
   bool text_next(std::istream & in, double & t);
-  bool binary_next(std::istream & in, int & t);
+  bool binary_next(std::istream & in, double & t);
   void text_update(std::istream & in1, std::istream & in2);
   void binary_update(std::istream & in1, std::istream & in2);
   void update_snr(double t1, double t2);

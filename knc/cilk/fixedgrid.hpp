@@ -11,8 +11,13 @@
 
 #include <cstdlib>
 #include <cerrno>
+#include <cassert>
 #include "timer.hpp"
 
+#ifndef __INTEL_COMPILER
+#define __assume_aligned(X, Y)
+#define __assume(X)
+#endif
 
 namespace fixedgrid {
 
@@ -26,7 +31,7 @@ class Model
 
 public:
 
-  enum { NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + 15) & ~15UL) };
+  enum { NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + 15) & ~15UL), BLOCK=16 };
 
   typedef real_t (*matrix_t)[NCOLS_ALIGNED];
 
@@ -76,12 +81,10 @@ private:
         std::cerr << "ERROR: Insufficient memory for allocation" << std::endl;
         return NULL;
     }
-
-    real_t * __restrict__ p = (real_t*)memptr;
-    __assume_aligned(p, 64);
-    p[0:NROWS*NCOLS_ALIGNED] = init;
-
-    return (matrix_t)memptr;
+    matrix_t m = (matrix_t)memptr;
+    __assume_aligned(m, 64);
+    m[0:NROWS][0:NCOLS] = init;
+    return m;
   }
 
   int WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname);
@@ -171,117 +174,109 @@ real_t advec_diff(
 /*
  * Applies advection / diffusion stencil
  */
-static inline void space_advec_diff(
-    size_t const N, real_t const cell_size,
-    real_t const cb0, real_t const wb0, real_t const db0,
-    real_t const cb1, real_t const wb1, real_t const db1,
-    real_t const cb2, real_t const wb2, real_t const db2,
-    real_t const cb3, real_t const wb3, real_t const db3,
-    real_t const * __restrict__ c,
-    real_t const * __restrict__ w,
-    real_t const * __restrict__ d,
-    real_t * __restrict__ dcdx)
+template < size_t N >
+static inline void space_advec_diff(real_t const cell_size,
+    real_t const c[N], real_t const w[N], real_t const d[N], real_t dcdx[N])
 {
   __assume_aligned(c, 64);
   __assume_aligned(w, 64);
   __assume_aligned(d, 64);
   __assume_aligned(dcdx, 64);
-  __assume(N%16==0);
 
   /* Do boundary cell c[0] explicitly */
   dcdx[0] = advec_diff(cell_size,
-      cb0, wb0, db0,  /* 2-left neighbors */
-      cb1, wb1, db1,  /* 1-left neighbors */
-      c[0], w[0], d[0],     /* Values */
-      c[1], w[1], d[1],     /* 1-right neighbors */
-      c[2], w[2], d[2]);    /* 2-right neighbors */
+      c[N-2], w[N-2], d[N-2],   /* 2-left neighbors */
+      c[N-1], w[N-1], d[N-1],   /* 1-left neighbors */
+      c[ 0 ], w[ 0 ], d[ 0 ],   /* Values */
+      c[ 1 ], w[ 1 ], d[ 1 ],   /* 1-right neighbors */
+      c[ 2 ], w[ 2 ], d[ 2 ]);  /* 2-right neighbors */
 
   /* Do boundary cell c[1] explicitly */
   dcdx[1] = advec_diff(cell_size,
-      cb1, wb1, db1,  /* 2-left neighbors */
-      cb2, wb2, db2,  /* 1-left neighbors */
-      c[1], w[1], d[1],     /* Values */
-      c[2], w[2], d[2],     /* 1-right neighbors */
-      c[3], w[3], d[3]);    /* 2-right neighbors */
+      c[N-1], w[N-1], d[N-1],   /* 2-left neighbors */
+      c[ 0 ], w[ 0 ], d[ 0 ],   /* 1-left neighbors */
+      c[ 1 ], w[ 1 ], d[ 1 ],   /* Values */
+      c[ 2 ], w[ 2 ], d[ 2 ],   /* 1-right neighbors */
+      c[ 3 ], w[ 3 ], d[ 3 ]);  /* 2-right neighbors */
 
   for(int i=2; i<N-2; ++i) {
       dcdx[i] = advec_diff(cell_size,
-          c[i-2], w[i-2], d[i-2],  /* 2-left neighbors */
-          c[i-1], w[i-1], d[i-1],  /* 1-left neighbors */
-          c[i],   w[i],   d[i],    /* Values */
-          c[i+1], w[i+1], d[i+1],  /* 1-right neighbors */
-          c[i+2], w[i+2], d[i+2]); /* 2-right neighbors */
+          c[i-2], w[i-2], d[i-2],   /* 2-left neighbors */
+          c[i-1], w[i-1], d[i-1],   /* 1-left neighbors */
+          c[ i ], w[ i ], d[ i ],   /* Values */
+          c[i+1], w[i+1], d[i+1],   /* 1-right neighbors */
+          c[i+2], w[i+2], d[i+2]);  /* 2-right neighbors */
   }
 
   /* Do boundary cell c[n-2] explicitly */
   dcdx[N-2] = advec_diff(cell_size,
-      c[N-4], w[N-4], d[N-4],  /* 2-left neighbors */
-      c[N-3], w[N-3], d[N-3],  /* 1-left neighbors */
-      c[N-2], w[N-2], d[N-2],  /* Values */
-      cb1,  wb1,  db1,   /* 1-right neighbors */
-      cb2,  wb2,  db2);  /* 2-right neighbors */
+      c[N-4], w[N-4], d[N-4],   /* 2-left neighbors */
+      c[N-3], w[N-3], d[N-3],   /* 1-left neighbors */
+      c[N-2], w[N-2], d[N-2],   /* Values */
+      c[N-1], w[N-1], d[N-1],   /* 1-right neighbors */
+      c[ 0 ], w[ 0 ], d[ 0 ]);  /* 2-right neighbors */
 
   /* Do boundary cell c[n-1] explicitly */
   dcdx[N-1] = advec_diff(cell_size,
       c[N-3], w[N-3], d[N-3],  /* 2-left neighbors */
       c[N-2], w[N-2], d[N-2],  /* 1-left neighbors */
       c[N-1], w[N-1], d[N-1],  /* Values */
-      cb2,  wb2,  db2,   /* 1-right neighbors */
-      cb3,  wb3,  db3);  /* 2-right neighbors */
+      c[ 0 ], w[ 0 ], d[ 0 ],   /* 1-right neighbors */
+      c[ 1 ], w[ 1 ], d[ 1 ]);  /* 2-right neighbors */
 }
 
-
-static inline void discretize(
-    size_t const N, real_t const cell_size, real_t const dt,
-    real_t const * __restrict__ c,
-    real_t const * __restrict__ w,
-    real_t const * __restrict__ d,
-    real_t * __restrict co)
+template < size_t N, size_t CSTRIDE, size_t WSTRIDE, size_t DSTRIDE, size_t BLOCK >
+static inline void space_advec_diff(real_t const cell_size,
+    real_t const c[N][CSTRIDE],
+    real_t const w[N][WSTRIDE],
+    real_t const d[N][DSTRIDE],
+    real_t dcdx[N][BLOCK])
 {
   __assume_aligned(c, 64);
   __assume_aligned(w, 64);
   __assume_aligned(d, 64);
-  __assume_aligned(co, 64);
-  __assume(N%16==0);
+  __assume_aligned(dcdx, 64);
 
-  real_t buff[N] __attribute__((aligned(64)));
-  real_t dcdx[N] __attribute__((aligned(64)));
+  /* Do boundary cell c[0] explicitly */
+  dcdx[0][:] = advec_diff(cell_size,
+      c[N-2][0:BLOCK], w[N-2][0:BLOCK], d[N-2][0:BLOCK],   /* 2-left neighbors */
+      c[N-1][0:BLOCK], w[N-1][0:BLOCK], d[N-1][0:BLOCK],   /* 1-left neighbors */
+      c[ 0 ][0:BLOCK], w[ 0 ][0:BLOCK], d[ 0 ][0:BLOCK],   /* Values */
+      c[ 1 ][0:BLOCK], w[ 1 ][0:BLOCK], d[ 1 ][0:BLOCK],   /* 1-right neighbors */
+      c[ 2 ][0:BLOCK], w[ 2 ][0:BLOCK], d[ 2 ][0:BLOCK]);  /* 2-right neighbors */
 
-  real_t const cb0 = c[N-2];
-  real_t const cb1 = c[N-1];
-  real_t const cb2 = c[0];
-  real_t const cb3 = c[1];
-  real_t const wb0 = w[N-2];
-  real_t const wb1 = w[N-1];
-  real_t const wb2 = w[0];
-  real_t const wb3 = w[1];
-  real_t const db0 = d[N-2];
-  real_t const db1 = d[N-1];
-  real_t const db2 = d[0];
-  real_t const db3 = d[1];
+  /* Do boundary cell c[1] explicitly */
+  dcdx[1][:] = advec_diff(cell_size,
+      c[N-1][0:BLOCK], w[N-1][0:BLOCK], d[N-1][0:BLOCK],   /* 2-left neighbors */
+      c[ 0 ][0:BLOCK], w[ 0 ][0:BLOCK], d[ 0 ][0:BLOCK],   /* 1-left neighbors */
+      c[ 1 ][0:BLOCK], w[ 1 ][0:BLOCK], d[ 1 ][0:BLOCK],   /* Values */
+      c[ 2 ][0:BLOCK], w[ 2 ][0:BLOCK], d[ 2 ][0:BLOCK],   /* 1-right neighbors */
+      c[ 3 ][0:BLOCK], w[ 3 ][0:BLOCK], d[ 3 ][0:BLOCK]);  /* 2-right neighbors */
 
-  co[0:N] = c[0:N];
-  buff[0:N] = c[0:N];
+  for(int i=2; i<N-2; ++i) {
+    dcdx[i][0:BLOCK] = advec_diff(cell_size,
+        c[i-2][0:BLOCK], w[i-2][0:BLOCK], d[i-2][0:BLOCK],   /* 2-left neighbors */
+        c[i-1][0:BLOCK], w[i-1][0:BLOCK], d[i-1][0:BLOCK],   /* 1-left neighbors */
+        c[ i ][0:BLOCK], w[ i ][0:BLOCK], d[ i ][0:BLOCK],   /* Values */
+        c[i+1][0:BLOCK], w[i+1][0:BLOCK], d[i+1][0:BLOCK],   /* 1-right neighbors */
+        c[i+2][0:BLOCK], w[i+2][0:BLOCK], d[i+2][0:BLOCK]);  /* 2-right neighbors */
+  }
 
-  space_advec_diff(
-      N, cell_size,
-      cb0, wb0, db0,
-      cb1, wb1, db1,
-      cb2, wb2, db2,
-      cb3, wb3, db3,
-      c, w, d, dcdx);
-  buff[0:N] += dt * dcdx[0:N];
+  /* Do boundary cell c[n-2] explicitly */
+  dcdx[N-2][:] = advec_diff(cell_size,
+      c[N-4][0:BLOCK], w[N-4][0:BLOCK], d[N-4][0:BLOCK],   /* 2-left neighbors */
+      c[N-3][0:BLOCK], w[N-3][0:BLOCK], d[N-3][0:BLOCK],   /* 1-left neighbors */
+      c[N-2][0:BLOCK], w[N-2][0:BLOCK], d[N-2][0:BLOCK],   /* Values */
+      c[N-1][0:BLOCK], w[N-1][0:BLOCK], d[N-1][0:BLOCK],   /* 1-right neighbors */
+      c[ 0 ][0:BLOCK], w[ 0 ][0:BLOCK], d[ 0 ][0:BLOCK]);  /* 2-right neighbors */
 
-  space_advec_diff(
-      N, cell_size,
-      cb0, wb0, db0,
-      cb1, wb1, db1,
-      cb2, wb2, db2,
-      cb3, wb3, db3,
-      buff, w, d, dcdx);
-  buff[0:N] += dt * dcdx[0:N];
-
-  co[0:N] = 0.5 * (co[0:N] + buff[0:N]);
+  /* Do boundary cell c[n-1] explicitly */
+  dcdx[N-1][:] = advec_diff(cell_size,
+      c[N-3][0:BLOCK], w[N-3][0:BLOCK], d[N-3][0:BLOCK],  /* 2-left neighbors */
+      c[N-2][0:BLOCK], w[N-2][0:BLOCK], d[N-2][0:BLOCK],  /* 1-left neighbors */
+      c[N-1][0:BLOCK], w[N-1][0:BLOCK], d[N-1][0:BLOCK],  /* Values */
+      c[ 0 ][0:BLOCK], w[ 0 ][0:BLOCK], d[ 0 ][0:BLOCK],   /* 1-right neighbors */
+      c[ 1 ][0:BLOCK], w[ 1 ][0:BLOCK], d[ 1 ][0:BLOCK]);  /* 2-right neighbors */
 }
 
 
@@ -295,20 +290,24 @@ void Model<M,N>::discretize_rows()
     TIMER_START("Row Discret");
 
     /* Buffers */
-    real_t buff[NCOLS_ALIGNED] __attribute__((aligned(64)));
+    real_t b[NCOLS_ALIGNED] __attribute__((aligned(64)));
+    real_t dcdx[NCOLS_ALIGNED] __attribute__((aligned(64)));
 
-    #pragma omp for private(buff)
+    #pragma omp for private(b, dcdx)
     for (int i = 0; i < NROWS; i++) {
-      real_t * __restrict__ c = conc[i];
+      real_t const * __restrict__ c = conc[i];
       real_t const * __restrict__ w = wind_u[i];
       real_t const * __restrict__ d = diff[i];
 
-      __assume_aligned(c, 64);
-      __assume_aligned(w, 64);
-      __assume_aligned(d, 64);
+      b[:] = c[0:NCOLS_ALIGNED];
 
-      discretize(NCOLS_ALIGNED, dx, 0.5*dt, c, w, d, buff);
-      c[0:NCOLS_ALIGNED] = buff[:];
+      space_advec_diff<NCOLS_ALIGNED>(dx, c, w, d, dcdx);
+      b[:] += 0.5*dt * dcdx[:];
+
+      space_advec_diff<NCOLS_ALIGNED>(dx, b, w, d, dcdx);
+      b[:] += 0.5*dt * dcdx[:];
+
+      conc[i][:] = 0.5 * (conc[i][:] + b[:]);
     }
 
     TIMER_STOP("Row Discret");
@@ -325,24 +324,45 @@ void Model<M,N>::discretize_cols()
     TIMER_START("Col Discret");
 
     /* Buffers */
-    real_t ccol[NROWS] __attribute__((aligned(64)));
-    real_t wcol[NROWS] __attribute__((aligned(64)));
-    real_t dcol[NROWS] __attribute__((aligned(64)));
-    real_t buff[NROWS] __attribute__((aligned(64)));
+    real_t b[NROWS][BLOCK] __attribute__((aligned(64)));
+    real_t dcdx[NROWS][BLOCK] __attribute__((aligned(64)));
 
-    #pragma omp for private(ccol, wcol, dcol, buff)
-    for (int j = 0; j < NCOLS; j++) {
-      ccol[:] = conc[0:NROWS][j];
-      wcol[:] = wind_v[0:NROWS][j];
-      dcol[:] = diff[0:NROWS][j];
+    #pragma omp for private(b, dcdx)
+    for (int j=0; j < NCOLS; j+=BLOCK) {
+      b[:][:] = conc[0:NROWS][j:BLOCK];
 
-      discretize(NROWS, dy, dt, ccol, wcol, dcol, buff);
-      conc[0:NROWS][j] = buff[:];
+      space_advec_diff<NROWS, NCOLS_ALIGNED, NCOLS_ALIGNED, NCOLS_ALIGNED, BLOCK>(dy,
+          (real_t (*)[NCOLS_ALIGNED])(conc[0] + j),
+          (real_t (*)[NCOLS_ALIGNED])(wind_v[0] + j),
+          (real_t (*)[NCOLS_ALIGNED])(diff[0] + j),
+          dcdx);
+
+      // COMPILER BUG: icpc (ICC) 14.0.1 20131008
+      // This line should be the same as the for-loop but it's not!
+      // b[:][:] += dt * dcdx[:][:];
+      for (int i=0; i<NROWS; ++i) {
+        b[i][:] += dt * dcdx[i][:];
+      }
+
+      space_advec_diff<NROWS, BLOCK, NCOLS_ALIGNED, NCOLS_ALIGNED, BLOCK>(dy,
+          b,
+          (real_t (*)[NCOLS_ALIGNED])(wind_v[0] + j),
+          (real_t (*)[NCOLS_ALIGNED])(diff[0] + j),
+          dcdx);
+
+      // COMPILER BUG: icpc (ICC) 14.0.1 20131008
+      // This line should be the same as the for-loop but it's not!
+      // b[:][:] += dt * dcdx[:][:];
+      for (int i=0; i<NROWS; ++i) {
+        b[i][:] += dt * dcdx[i][:];
+      }
+
+      conc[0:NROWS][j:BLOCK] = 0.5 * (conc[0:NROWS][j:BLOCK] + b[:][:]);
     }
-
     TIMER_STOP("Col Discret");
   }
 }
+
 
 /*
   * From gnuplot/doc/html/gnuplot.html:
@@ -481,4 +501,5 @@ void Model<M,N>::Step(real_t tstart, real_t tend, real_t dt)
 
 } // namespace fixedgrid
 
-#endif
+#endif // #ifndef __FIXEDGRID_HPP__
+
