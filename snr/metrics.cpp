@@ -118,8 +118,12 @@ void Metrics::update_snr(double t1, double t2)
   nAbsErr += (absErr > ABS_ERR_THRESH);
 
   if (relErr > REL_ERR_THRESH && absErr > ABS_ERR_THRESH) {
+    if (nErr < 100) {
+      printf("%e != %e    (abs=%e, rel=%e)\n", t1, t2, absErr, relErr);
+    } else if (nErr == 100) {
+      printf("Over 100 errors!\n");
+    }
     ++nErr;
-    printf("%e != %e    (abs=%e, rel=%e)\n", t1, t2, absErr, relErr);
   }
 }
 
