@@ -25,13 +25,13 @@ namespace fixedgrid {
 typedef float real_t;
 
 /* Model state variables */
-template < size_t M, size_t N >
+template < size_t M, size_t N, size_t B=16 >
 class Model
 {
 
 public:
 
-  enum { NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + 15) & ~15UL), BLOCK=16 };
+  enum { BLOCK=B, NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + (B-1)) & ~(B-1)) };
 
   typedef real_t (*matrix_t)[NCOLS_ALIGNED];
 
@@ -283,8 +283,8 @@ static inline void space_advec_diff(real_t const cell_size,
 /**
  * Discretize rows 1/2 timestep
  */
-template < size_t M, size_t N >
-void Model<M,N>::discretize_rows()
+template < size_t M, size_t N, size_t B >
+void Model<M,N,B>::discretize_rows()
 {
   if (row_discret) {
     TIMER_START("Row Discret");
@@ -317,11 +317,13 @@ void Model<M,N>::discretize_rows()
 /**
  * Discretize colums 1 timestep
  */
-template < size_t M, size_t N >
-void Model<M,N>::discretize_cols()
+template < size_t M, size_t N, size_t B >
+void Model<M,N,B>::discretize_cols()
 {
   if (col_discret) {
     TIMER_START("Col Discret");
+
+#if USE_BLOCKED_DISCRETIZE
 
     /* Buffers */
     real_t b[NROWS][BLOCK] __attribute__((aligned(64)));
@@ -359,10 +361,36 @@ void Model<M,N>::discretize_cols()
 
       conc[0:NROWS][j:BLOCK] = 0.5 * (conc[0:NROWS][j:BLOCK] + b[:][:]);
     }
+
+#else /* USE_BLOCKED_DISCRETIZE */
+
+    /* Buffers */
+    real_t b[NROWS] __attribute__((aligned(64)));
+    real_t c[NROWS] __attribute__((aligned(64)));
+    real_t w[NROWS] __attribute__((aligned(64)));
+    real_t d[NROWS] __attribute__((aligned(64)));
+    real_t dcdx[NROWS] __attribute__((aligned(64)));
+
+    #pragma omp for private(b, c, w, d, dcdx)
+    for (int j = 0; j < NCOLS; j++) {
+      b[:] = c[:] = conc[0:NROWS][j];
+      w[:] = wind_v[0:NROWS][j];
+      d[:] = diff[0:NROWS][j];
+
+      space_advec_diff<NROWS>(dy, c, w, d, dcdx);
+      b[:] += dt * dcdx[:];
+
+      space_advec_diff<NROWS>(dy, b, w, d, dcdx);
+      b[:] += dt * dcdx[:];
+
+      conc[0:NROWS][j] = 0.5 * (conc[0:NROWS][j] + b[:]);
+    }
+
+#endif /* USE_BLOCKED_DISCRETIZE */
+
     TIMER_STOP("Col Discret");
   }
 }
-
 
 /*
   * From gnuplot/doc/html/gnuplot.html:
@@ -395,8 +423,8 @@ void Model<M,N>::discretize_cols()
   * These triplets are then converted into gnuplot iso-curves and then gnuplot
   * proceeds in the usual manner to do the rest of the plotting.
   */
-template < size_t M, size_t N >
-int Model<M,N>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname)
+template < size_t M, size_t N, size_t B >
+int Model<M,N,B>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname)
 {
   using namespace std;
 
@@ -436,8 +464,8 @@ int Model<M,N>::WriteGnuplotBinaryMatrixFile(matrix_t mat, char const * fname)
   return 0;
 }
 
-template < size_t M, size_t N >
-void Model<M,N>::WriteConcFile(void)
+template < size_t M, size_t N, size_t B >
+void Model<M,N,B>::WriteConcFile(void)
 {
   TIMER_START("File I/O");
 
@@ -454,8 +482,8 @@ void Model<M,N>::WriteConcFile(void)
   TIMER_STOP("File I/O");
 }
 
-template < size_t M, size_t N >
-void Model<M,N>::Step(real_t tstart, real_t tend, real_t dt)
+template < size_t M, size_t N, size_t B >
+void Model<M,N,B>::Step(real_t tstart, real_t tend, real_t dt)
 {
   TIMER_START("Step");
 

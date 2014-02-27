@@ -1,5 +1,5 @@
 
-MIC_OFFLOAD = 1
+MIC_OFFLOAD = 0
 TIMERS_ENABLED = 1
 
 ifndef TAU_MAKEFILE
@@ -16,11 +16,11 @@ else
   MIC_LDFLAGS = -mmic
 endif
 
-REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report6
+REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report5
 OPT_CXXFLAGS = -O3 -g -openmp
 
 LD = $(CXX)
-REPORT_LDFLAGS = -opt-report-phase=offload -vec-report6
+REPORT_LDFLAGS = -opt-report-phase=offload -vec-report5
 OPT_LDFLAGS = -O3 -g -openmp
 
 LIBS = -lm
