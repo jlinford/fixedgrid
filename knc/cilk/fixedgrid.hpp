@@ -31,7 +31,7 @@ class Model
 
 public:
 
-  enum { BLOCK=B, NROWS=M, NCOLS=N, NCOLS_ALIGNED=((NCOLS + (B-1)) & ~(B-1)) };
+  enum { BLOCK=B, NROWS=M, NCOLS=N, NCOLS_ALIGNED=((N + (B-1)) & ~(B-1)) };
 
   typedef real_t (*matrix_t)[NCOLS_ALIGNED];
 
@@ -225,6 +225,7 @@ static inline void space_advec_diff(real_t const cell_size,
       c[ 1 ], w[ 1 ], d[ 1 ]);  /* 2-right neighbors */
 }
 
+
 template < size_t N, size_t CSTRIDE, size_t WSTRIDE, size_t DSTRIDE, size_t BLOCK >
 static inline void space_advec_diff(real_t const cell_size,
     real_t const c[N][CSTRIDE],
@@ -290,8 +291,8 @@ void Model<M,N,B>::discretize_rows()
     TIMER_START("Row Discret");
 
     /* Buffers */
-    real_t b[NCOLS_ALIGNED] __attribute__((aligned(64)));
-    real_t dcdx[NCOLS_ALIGNED] __attribute__((aligned(64)));
+    real_t b[NCOLS] __attribute__((aligned(64)));
+    real_t dcdx[NCOLS] __attribute__((aligned(64)));
 
     #pragma omp for private(b, dcdx)
     for (int i = 0; i < NROWS; i++) {
@@ -299,15 +300,15 @@ void Model<M,N,B>::discretize_rows()
       real_t const * __restrict__ w = wind_u[i];
       real_t const * __restrict__ d = diff[i];
 
-      b[:] = c[0:NCOLS_ALIGNED];
+      b[:] = c[0:NCOLS];
 
-      space_advec_diff<NCOLS_ALIGNED>(dx, c, w, d, dcdx);
+      space_advec_diff<NCOLS>(dx, c, w, d, dcdx);
       b[:] += 0.5*dt * dcdx[:];
 
-      space_advec_diff<NCOLS_ALIGNED>(dx, b, w, d, dcdx);
+      space_advec_diff<NCOLS>(dx, b, w, d, dcdx);
       b[:] += 0.5*dt * dcdx[:];
 
-      conc[i][:] = 0.5 * (conc[i][:] + b[:]);
+      conc[i][0:NCOLS] = 0.5 * (conc[i][0:NCOLS] + b[:]);
     }
 
     TIMER_STOP("Row Discret");
