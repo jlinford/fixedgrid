@@ -1,5 +1,4 @@
-
-MIC_OFFLOAD = 1
+TARGET = offload
 TIMERS_ENABLED = 1
 USE_BLOCKED_DISCRETIZE = 1
 
@@ -9,12 +8,17 @@ else
   CXX = tau_cxx.sh -optTauSelectFile=select.tau
 endif
 
-ifeq ($(MIC_OFFLOAD),1)
-  MIC_CXXFLAGS = -xhost
-  MIC_LDFLAGS =
-else
+ifeq ($(TARGET),host)
+  MIC_CXXFLAGS = -xhost -no-offload
+  MIC_LDFLAGS = 
+else ifeq ($(TARGET),device)
   MIC_CXXFLAGS = -mmic
   MIC_LDFLAGS = -mmic
+else ifeq ($(TARGET),offload)
+  MIC_CXXFLAGS = -xhost
+  MIC_LDFLAGS = 
+else
+  $(error Unknown TARGET)
 endif
 
 REPORT_CXXFLAGS = -opt-report-phase=offload -vec-report5
